@@ -1,2 +1,3 @@
 # WRK-test
-A test repository for the WRK project to test integrations with Monday.com
+
+A repository for the metrics work with the WRK group in 2022.

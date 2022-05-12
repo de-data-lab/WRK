@@ -15,5 +15,5 @@ setAccountInfo(name = error_on_missing_name("SHINY_ACC_NAME"),
 deployApp(
   appDir = "app",
   appFiles = NULL, # deploy everything in the app folder
-  appName = error_on_missing_name("MASTERNAME"),
+  appName = error_on_missing_name("APP_NAME"),
   appTitle = "WRK Dashboard")

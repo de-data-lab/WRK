@@ -19,7 +19,7 @@ library(here)
 library(shiny)
 library(plotly)
 
-source(here("utiils.R"))
+source(here("utils/utils.R"))
 source(here("utils/plot_education.R"))
 
 

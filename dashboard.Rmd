@@ -1,11 +1,15 @@
 ---
-title: "HUD Dashboard"
+title: "WRK Dashboard"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: fill
+    theme: 
+      version: 4
+      bootswatch: cosmo
 runtime: shiny
 ---
+
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
@@ -13,8 +17,10 @@ library(tidyverse)
 library(readxl)
 library(here)
 library(shiny)
+library(plotly)
 
 source(here("utiils.R"))
+source(here("utils/plot_education.R"))
 
 
 ## Load HUD Data 
@@ -50,6 +56,7 @@ hud_var_def <- hud_vars_df %>%
   deframe()
 ```
 
+# Housing {.tabsets}
 
 Inputs {.sidebar}
 -----------------------------------------------------------------------
@@ -167,7 +174,57 @@ renderPlot({
 })
 ```
 
+# Education
 
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+
+### Education
+```{r}
+# Input
+default_contentareas <- c("ELA", "MATH")
+selectInput(
+  inputId = "contentareas",
+  label = "Content Areas", 
+  choices = contentareas,
+  multiple = TRUE,
+  selected = default_contentareas
+)
+
+default_groups <- c("State of Delaware", "East Side Charter School")
+selectInput(
+  inputId = "groups",
+  label = "Groups", 
+  choices = rev(groups),
+  multiple = TRUE,
+  selected = default_groups
+)
+
+actionButton("educationReset",
+             icon = icon("refresh"),
+             label = "Reset")
+
+observeEvent(input$educationReset, {
+  updateSelectInput(session, "groups", selected = default_groups)
+  return (NULL)
+})
+```
+
+
+Row 1
+-----------------------------------------------------------------------
+
+```{r}
+output$plot <- renderPlotly({
+  plot_education(input$contentareas, input$groups) %>%
+    ggplotly(tooltip = c("y", "x", "colour"), dynamicTicks = FALSE)
+})
+
+plotlyOutput("plot", height = "100%")
+```
+
+
+<!-- Markdown Links -->
 
 [CT3002]: https://censusreporter.org/profiles/14000US10003003002-census-tract-3002-new-castle-de/
 [CT602]: https://censusreporter.org/profiles/14000US10003000602-census-tract-602-new-castle-de/

@@ -1,0 +1,38 @@
+---
+title: "WRK Project Working Notes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+# Housing {.tabset}
+
+## Insights
+
+See [the HUD dashboard](https://nami-techimpact.shinyapps.io/hud_dashboard) for public housing data over time 
+
+## Data Sources
+
+-   [US Housing and Urban Development (HUD) - Public Housing Dataset](https://www.huduser.gov/portal/datasets/assthsg.html)
+
+-   [Zillow](https://www.zillow.com/research/data/)
+
+# Education
+
+-   Early Education: [Kids Count - Kindergarten Readiness in Delaware](https://datacenter.kidscount.org/data/tables/10050-kindergarten-readiness)
+-   Grades 3-2: [DE Open Data - Student Learning Assessment](https://data.delaware.gov/Education/Student-Assessment-Performance/ms6b-mt82)
+
+# Workforce Development
+
+Unemployment:
+
+-   Census (e.g., Table [B23025](https://censusreporter.org/tables/B23025/))
+-   [Department of Labor - Unemployment Insurance Data](https://oui.doleta.gov/unemploy/DataDownloads.asp)
+
+# Safety
+
+[Wilmington Police Department](https://www.wilmingtonde.gov/government/public-safety/wilmington-police-department/compstat-reports) publishes

@@ -211,9 +211,8 @@ observeEvent(input$educationReset, {
 ```
 
 
-Row 1
+Proficiency
 -----------------------------------------------------------------------
-
 ```{r}
 output$plot <- renderPlotly({
   plot_education(input$contentareas, input$groups) %>%
@@ -221,6 +220,38 @@ output$plot <- renderPlotly({
 })
 
 plotlyOutput("plot", height = "100%")
+```
+
+
+# Workforce Development
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+### Workforce Development
+
+#### Data Sources
+- [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn)
+
+
+High School Graduation
+-----------------------------------------------------------------------
+
+```{r}
+graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
+output$graduation <- renderPlotly({
+  out_plot <- graduation %>% 
+    ggplot(aes(x = schoolyear, y = pctgraduates,
+               color = organization, group = organization)) +
+    geom_line() +
+    geom_point() +
+    facet_grid(. ~ ratetype) +
+    scale_y_continuous(labels = ~paste0(., "%")) +
+    ggtitle("High school graduation rate")
+  
+    return(ggplotly(out_plot))
+})
+
+plotlyOutput("graduation")
 ```
 
 

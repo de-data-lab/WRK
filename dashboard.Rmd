@@ -246,6 +246,9 @@ output$graduation <- renderPlotly({
     geom_point() +
     facet_grid(. ~ ratetype) +
     scale_y_continuous(labels = ~paste0(., "%")) +
+    ylab(NULL) +
+    xlab(NULL) + 
+    labs(color = NULL) + 
     ggtitle("High school graduation rate")
   
     return(ggplotly(out_plot))

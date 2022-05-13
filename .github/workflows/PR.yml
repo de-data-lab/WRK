@@ -25,7 +25,7 @@ jobs:
       
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${{ github.head_ref }} | sed -e 's/\//-/g')"
+        run: echo "##[set-output name=branch;]$(echo ${{github.ref_name}}-${{ github.head_ref }} | sed -e 's/\//-/g')"
         id: extract_branch
         
       - name: Set app name

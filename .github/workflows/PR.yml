@@ -52,11 +52,3 @@ jobs:
             -e APP_NAME=${{ steps.set_app_name.outputs.appName }}
             pullrequestimage
           retry_wait_seconds: 10
-
-  deployment: 
-    runs-on: ubuntu-latest
-    environment:
-      name: Development
-      url: echo "https://${{secrets.SHINY_ACC_NAME}}.shinyapps.io/${{ steps.set_app_name.outputs.appName }}"
-      steps: 
-        - name: deploy

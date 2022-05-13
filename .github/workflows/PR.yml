@@ -23,6 +23,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       
+      # Create a unique test app for each PR
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${{github.ref_name}}-${{ github.head_ref }} | sed -e 's/\//-/g')"

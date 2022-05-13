@@ -36,9 +36,7 @@ jobs:
       # Build image
       - name: Build image
         run: docker build -t pullrequestimage . 
-      # run the image (but supply the TESTNAME in stead of MASTERNAME, so the 
-      # app ends up in a different place.   
-      
+        
       # # Execute
       # - name: Execute
       #   # Retry when not successful

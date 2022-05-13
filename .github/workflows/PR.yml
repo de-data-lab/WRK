@@ -28,7 +28,7 @@ jobs:
         
       - name: Set app name
         shell: bash
-        run: echo "##[set-output name=appName;]$(echo ${{secrets.TEST_APP_NAME}}${{ steps.extract_branch.outputs.branch }})"
+        run: echo "##[set-output name=appName;]$(echo ${{secrets.TEST_APP_NAME}}-${{ steps.extract_branch.outputs.branch }})"
         id: set_app_name
 
       # Build image

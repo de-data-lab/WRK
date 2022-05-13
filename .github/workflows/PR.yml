@@ -38,18 +38,18 @@ jobs:
       - name: Build image
         run: docker build -t pullrequestimage . 
         
-      # # Execute
-      # - name: Execute
-      #   # Retry when not successful
-      #   uses: nick-fields/retry@v2.4.0
-      #   with:
-      #     timeout_minutes: 5
-      #     max_attempts: 3
-      #     command: >
-      #       docker run 
-      #       -e SHINY_ACC_NAME=${{secrets.SHINY_ACC_NAME}} 
-      #       -e TOKEN=${{secrets.TOKEN}} 
-      #       -e SECRET=${{secrets.SECRET}} 
-      #       -e APP_NAME=${{ steps.set_app_name.outputs.appName }}
-      #       pullrequestimage
-      #     retry_wait_seconds: 10
+      # Execute
+      - name: Execute
+        # Retry when not successful
+        uses: nick-fields/retry@v2.4.0
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: >
+            docker run
+            -e SHINY_ACC_NAME=${{secrets.SHINY_ACC_NAME}}
+            -e TOKEN=${{secrets.TOKEN}}
+            -e SECRET=${{secrets.SECRET}}
+            -e APP_NAME=${{ steps.set_app_name.outputs.appName }}
+            pullrequestimage
+          retry_wait_seconds: 10

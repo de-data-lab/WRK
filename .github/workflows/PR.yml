@@ -60,3 +60,5 @@ jobs:
     environment:
       name: Development
       url: echo "https://${{secrets.SHINY_ACC_NAME}}.shinyapps.io/${{ steps.set_app_name.outputs.appName }}"
+      steps: 
+        - name: deploy

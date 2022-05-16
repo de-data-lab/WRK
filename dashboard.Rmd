@@ -264,8 +264,8 @@ gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"] %>%
 
 ### Summary
 
-- On average the gaps in the graduation rate with the 
-state average increased by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  
+- On average, the gaps in the graduation rate with the 
+state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  
 
 - However, if we focus on 2016 onwards, the gap may be improving. On average, the gap
 improved by `r gap_yearly_change_2016` per year from 2016 to 2020.

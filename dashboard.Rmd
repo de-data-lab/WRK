@@ -286,7 +286,7 @@ renderPlot({
     geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
                  size = 1.2) + 
     geom_point(size = 5) +
-    geom_hline(yintercept = 0) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
     labs(y = "Gap to Delaware Average",
          x = NULL,
          title = "Gaps in high-school graduation rate vs. state average") +

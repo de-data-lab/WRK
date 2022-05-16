@@ -228,6 +228,13 @@ plotlyOutput("plot", height = "100%")
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 ### Workforce Development
+```{r}
+# Load Data
+graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
+graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
+
+```
+
 
 #### Data Sources
 - [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn)
@@ -237,7 +244,6 @@ High School Graduation
 -----------------------------------------------------------------------
 
 ```{r}
-graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
 output$graduation <- renderPlotly({
   out_plot <- graduation %>% 
     ggplot(aes(x = schoolyear, y = pctgraduates,

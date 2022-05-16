@@ -3,6 +3,8 @@
 
 library(here)
 library(tidyverse)
+library(RColorBrewer)
+source(here("utils/get_de_open_data.R"))
 
 # Function to query the Open Data Delaware API
 
@@ -17,7 +19,7 @@ library(tidyverse)
 #                       "$limit" = "50000"))
 
 
-# Get data for 3 school districts 
+# Get data for 3 school districts ----------------------------------------------
 christina_brandywine_colonial <- get_de_open_data("t7e6-zcnn",
   list("$where" = "districtcode in(31,33,34)",
        "schoolcode" = "0", # Only get district-wide summaries
@@ -50,5 +52,32 @@ graduation_joined <- graduation_joined %>%
                   graduates, students, pctgraduates),
                 ~as.numeric(.)))
 
+# Add a variable to compare with the state with the 3 regions
+graduation_joined <- graduation_joined %>%
+  mutate(compare_w_state = recode(district, "State of Delaware" = "State of Delaware", .default = "Brandywine, Christina, or Colonial"))
+
 # Save the dataset
 write_rds(graduation_joined, here("data/processed/workforce_graduation.rds"))
+
+
+# Produce the wide file where one row represents a year ------------------------
+graduation_gaps  <- graduation_joined %>%
+  group_by(schoolyear, compare_w_state) %>%
+  summarise(pctgraduates = mean(pctgraduates))
+
+graduation_gaps_wide <- graduation_gaps %>%
+  ungroup() %>%
+  pivot_wider(names_from = compare_w_state, values_from = pctgraduates)
+
+# Calculate the gap
+graduation_gaps_wide <- graduation_gaps_wide %>%
+  mutate(gap = `Brandywine, Christina, or Colonial` - `State of Delaware`)
+
+# Add a color palette
+color_palette <- brewer.pal(n = 3, name = "Pastel1")
+graduation_gaps_wide <- graduation_gaps_wide %>%
+  mutate(plot_color = case_when(gap >= 0 ~ color_palette[[2]],
+                                gap < 0 ~ color_palette[[1]]))
+
+# Save the dataset
+write_rds(graduation_gaps_wide, here("data/processed/workforce_graduation_gaps.rds"))

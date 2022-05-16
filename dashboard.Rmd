@@ -228,16 +228,78 @@ plotlyOutput("plot", height = "100%")
 Sidebar {.sidebar}
 -----------------------------------------------------------------------
 ### Workforce Development
+```{r}
+# Load Data
+graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
+graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
+
+```
+
 
 #### Data Sources
 - [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn)
+
+Story
+-----------------------------------------------------------------------
+```{r}
+# Assume linear trend and calculate an average change
+graduation_gaps_lm <- lm(data = graduation_gaps,
+   formula  = gap ~ schoolyear)
+
+gap_yearly_change <- graduation_gaps_lm$coefficients["schoolyear"] %>%
+  sprintf("%.2f%%", .)
+start_year <- graduation_gaps_lm$model$schoolyear %>% min()
+end_year <-  graduation_gaps_lm$model$schoolyear %>% max()
+
+# From 2016 and onwards
+graduation_gaps_lm_2016 <- graduation_gaps %>% 
+  filter(schoolyear >= 2016) %>%
+  lm(data = .,
+   formula  = gap ~ schoolyear)
+gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"] %>%
+  sprintf("%.2f%%", .)
+
+```
+
+
+### Summary
+
+- On average, the gaps in the graduation rate with the 
+state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  
+
+- However, if we focus on 2016 onwards, the gap may be improving. On average, the gap
+improved by `r gap_yearly_change_2016` per year from 2016 to 2020.
+
+
+### 
+```{r}
+renderPlot({
+  # Plot the gap with the state average
+  graduation_gaps %>%
+    mutate(after_2016 = schoolyear >= 2016) %>%
+    ggplot(aes(x = schoolyear, y = gap, color = plot_color)) +
+    geom_smooth(method = "lm", se = FALSE,
+                alpha = 0.8, color = "gray") +
+    geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
+                method = "lm", se = FALSE,
+                color = "seagreen2") + 
+    geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
+                 size = 1.2) + 
+    geom_point(size = 5) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(y = "Gap to Delaware Average",
+         x = NULL,
+         title = "Gaps in high-school graduation rate vs. state average") +
+    guides(color = "none") +
+    scale_y_continuous(labels = ~paste0(., "%"), limits = c(NA, 7))
+})
+```
 
 
 High School Graduation
 -----------------------------------------------------------------------
 
 ```{r}
-graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
 output$graduation <- renderPlotly({
   out_plot <- graduation %>% 
     ggplot(aes(x = schoolyear, y = pctgraduates,

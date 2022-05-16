@@ -282,8 +282,7 @@ renderPlot({
                 alpha = 0.8, color = "gray") +
     geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
                 method = "lm", se = FALSE,
-                color = "seagreen2",
-                alpha = 0.5) + 
+                color = "seagreen2") + 
     geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
                  size = 1.2) + 
     geom_point(size = 5) +

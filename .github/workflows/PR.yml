@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: PR
+
+concurrency: Development
+
+# Controls when the workflow will run
+on:
+  pull_request: {}
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      # Create a unique test app for each PR
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${{github.ref_name}}-${{ github.head_ref }} | sed -e 's/\//-/g')"
+        id: extract_branch
+        
+      - name: Set app name
+        shell: bash
+        run: echo "##[set-output name=appName;]$(echo ${{secrets.TEST_APP_NAME}}-${{ steps.extract_branch.outputs.branch }})"
+        id: set_app_name
+
+      # Build image
+      - name: Build image
+        run: docker build -t pullrequestimage . 
+        
+      # Execute
+      - name: Execute
+        # Retry when not successful
+        uses: nick-fields/retry@v2.4.0
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: >
+            docker run
+            -e SHINY_ACC_NAME=${{secrets.SHINY_ACC_NAME}}
+            -e TOKEN=${{secrets.TOKEN}}
+            -e SECRET=${{secrets.SECRET}}
+            -e APP_NAME=${{ steps.set_app_name.outputs.appName }}
+            pullrequestimage
+          retry_wait_seconds: 10

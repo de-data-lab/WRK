@@ -15,7 +15,6 @@ census_api_key(Sys.getenv("CENSUS_API_KEY"))
 # acs1_vars <- load_variables(2020, "acs5")
 
 # Variables for unemployment
-# - B23025: 
 # Unemployment rate: B23025_005 (unemployed civilian labor force) / B23025_003 (total civilian labor force)
 # Not In labor force: https://www.census.gov/glossary/#term_Notinlaborforce
 

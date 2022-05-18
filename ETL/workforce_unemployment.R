@@ -8,6 +8,9 @@ library(here)
 library(tidyverse)
 library(tidycensus)
 
+source(here("utils/label_tracts_with_places.R"))
+
+
 # Set the API key for the Census 
 census_api_key(Sys.getenv("CENSUS_API_KEY"))
 
@@ -48,6 +51,10 @@ de_unemployment <- de_unemployment %>%
 # Calculate the proportions unemployed 
 de_unemployment <- de_unemployment %>%
   mutate(unemployed_prop = unemployedE / total_labor_forceE)
+
+# Label the tracts with city information
+de_unemployment <- de_unemployment %>%
+  label_tracts_with_places()
 
 # Save data
 write_rds(de_unemployment, here("data/processed/workforce_unemployment.rds"))

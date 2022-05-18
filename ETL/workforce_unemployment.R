@@ -8,6 +8,9 @@ library(here)
 library(tidyverse)
 library(tidycensus)
 
+source(here("utils/label_tracts_with_places.R"))
+
+
 # Set the API key for the Census 
 census_api_key(Sys.getenv("CENSUS_API_KEY"))
 
@@ -49,5 +52,48 @@ de_unemployment <- de_unemployment %>%
 de_unemployment <- de_unemployment %>%
   mutate(unemployed_prop = unemployedE / total_labor_forceE)
 
-# Save data
+# Label the tracts with city information
+de_unemployment <- de_unemployment %>%
+  label_tracts_with_places()
+
+# Save the tract data
+# Long format
 write_rds(de_unemployment, here("data/processed/workforce_unemployment.rds"))
+
+
+
+# Transform into summary tables
+unemployment_de <- unemployment %>%
+  group_by(year) %>%
+  summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
+  mutate(label = "Delaware")
+
+unemployment_wilmington <- unemployment %>%
+  filter(NAME_place == "Wilmington") %>% 
+  group_by(year) %>%
+  summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
+  mutate(label = "Wilmington")
+
+unemployment_target_tracts <- unemployment %>%
+  filter(GEOID %in% target_tracts) %>%
+  group_by(year) %>%
+  summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
+  mutate(label = "WRK")
+
+# Long format
+unemployment_summary_long <- unemployment_de %>%
+  bind_rows(unemployment_wilmington) %>%
+  bind_rows(unemployment_target_tracts)
+
+# Wide format - each row is a year
+unemployment_summary_wide <- unemployment_summary_long %>%
+  pivot_wider(names_from = label, values_from = unemployed_prop)
+# Calculate the gaps
+unemployment_summary_wide <- unemployment_summary_wide %>%
+  mutate(gap_to_Delaware = WRK - Delaware,
+         gap_to_Wilmington = WRK - Wilmington)
+
+# Save summary tables
+write_rds(unemployment_summary_long, here("data/processed/workforce_unemployment_sum_long.rds"))
+write_rds(unemployment_summary_wide, here("data/processed/workforce_unemployment_sum_wide.rds"))
+

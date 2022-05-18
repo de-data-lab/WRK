@@ -18,6 +18,8 @@ library(readxl)
 library(here)
 library(shiny)
 library(plotly)
+library(patchwork)
+
 
 source(here("utils/utils.R"))
 source(here("utils/plot_education.R"))
@@ -225,24 +227,33 @@ plotlyOutput("plot", height = "100%")
 
 # Workforce Development
 
-Sidebar {.sidebar}
------------------------------------------------------------------------
-### Workforce Development
 ```{r}
 # Load Data
 graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
 graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
 
+unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
+unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
+unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
+
 ```
 
 
-#### Data Sources
-- [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn)
+<!-- Sidebar {.sidebar} -->
+<!-- ----------------------------------------------------------------------- -->
+<!-- ### Workforce Development -->
 
-Story
+
+<!-- #### Data Sources -->
+<!-- - [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn) -->
+
+
+
+
+Row 1: Summary {data-height=300}
 -----------------------------------------------------------------------
 ```{r}
-# Assume linear trend and calculate an average change
+# Graduation: Assume linear trend and calculate an average change
 graduation_gaps_lm <- lm(data = graduation_gaps,
    formula  = gap ~ schoolyear)
 
@@ -259,10 +270,22 @@ graduation_gaps_lm_2016 <- graduation_gaps %>%
 gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"] %>%
   sprintf("%.2f%%", .)
 
+# Unemployment 
+unemployment_gaps_lm <- lm(data = unemployment_summary_wide,
+                           formula = gap_to_Wilmington ~ year)
+unemployment_gaps_yearly_change <- sprintf(fmt = "%.1f%%", unemployment_gaps_lm$coefficients["year"] * 100)
+unemployment_start_year <- unemployment_gaps_lm$model$year %>% min()
+unemployment_end_year <-  unemployment_gaps_lm$model$year %>% max()
+unemployment_gaps_lm_2017 <- unemployment_summary_wide %>%
+  filter(year >= 2017) %>%
+  lm(data = ., formula = gap_to_Wilmington ~ year)
+unemployment_gaps_yearly_change_2017 <- sprintf(fmt = "%.1f%%", unemployment_gaps_lm_2017$coefficients["year"] * 100)
 ```
 
 
-### Summary
+### Graduation
+
+#### Graduation
 
 - On average, the gaps in the graduation rate with the 
 state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  
@@ -271,33 +294,75 @@ state average worsened by `r gap_yearly_change` per year from `r start_year` to 
 improved by `r gap_yearly_change_2016` per year from 2016 to 2020.
 
 
-### 
+### Unemployment
+
+#### Unemployment
+
+- The gaps to the Wilmington's unemployment rate were improving on average
+by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year` to `r unemployment_end_year`
+
+- However, the gaps are worsening since 2017 by `r unemployment_gaps_yearly_change_2017` per year.
+
+
+
+Row 2: Plots {.tabset .tabset-fade data-height=800}
+-----------------------------------------------------------------------
+
+### Summary
+
 ```{r}
-renderPlot({
-  # Plot the gap with the state average
-  graduation_gaps %>%
-    mutate(after_2016 = schoolyear >= 2016) %>%
-    ggplot(aes(x = schoolyear, y = gap, color = plot_color)) +
-    geom_smooth(method = "lm", se = FALSE,
-                alpha = 0.8, color = "gray") +
-    geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
-                method = "lm", se = FALSE,
-                color = "seagreen2") + 
-    geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-                 size = 1.2) + 
-    geom_point(size = 5) +
-    geom_hline(yintercept = 0, linetype = "dashed") +
-    labs(y = "Gap to Delaware Average",
-         x = NULL,
-         title = "Gaps in high-school graduation rate vs. state average") +
-    guides(color = "none") +
-    scale_y_continuous(labels = ~paste0(., "%"), limits = c(NA, 7))
-})
+# Plot the gap with the state average
+grad_gap_plot <- graduation_gaps %>%
+  mutate(after_2016 = schoolyear >= 2016) %>%
+  ggplot(aes(x = schoolyear, y = gap, color = I(plot_color))) +
+  geom_smooth(method = "lm", se = FALSE,
+              alpha = 0.8, color = "gray") +
+  geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
+              method = "lm", se = FALSE,
+              color = "seagreen2") + 
+  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
+               size = 1.2) + 
+  geom_point(size = 5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = NULL,
+       x = NULL,
+       title = "Gaps in high-school graduation rate vs. state average") +
+  guides(color = "none") +
+  scale_y_continuous(labels = ~sprintf("%.1f%%", .), limits = c(NA, NA)) + 
+  scale_x_continuous(breaks = scales::breaks_pretty()) +
+  labs(caption = "Data source: DE Open Data \n Data points are the aggregates among Brandywine, Christiana, and Colonial School districts.") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+```
+
+```{r}
+unemployment_plot <- unemployment_summary_wide %>%   
+ggplot(aes(x = year, y = gap_to_Wilmington)) +
+  geom_smooth(method = "lm", se = FALSE,
+              alpha = 0.8, color = "gray") +
+  geom_segment(aes(x = year, 
+                   xend = year,
+                   y = 0, yend = gap_to_Wilmington),
+               size = 1.2,
+               color = "#FBB4AE") + 
+  geom_point(size = 5, color = "#FBB4AE") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(y = NULL,
+       x = NULL,
+       title = "Gaps in unemployment rate vs. Wilmington",
+       color = NULL) +
+  scale_y_continuous(labels = scales::label_percent(), limits = c(NA, NA)) + 
+  scale_x_continuous(breaks = scales::pretty_breaks()) + 
+  labs(caption = "Data source: 5-year ACS") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+renderPlot({grad_gap_plot + unemployment_plot}, res = 100)
 ```
 
 
-High School Graduation
------------------------------------------------------------------------
+### Graduation 
 
 ```{r}
 output$graduation <- renderPlotly({
@@ -318,6 +383,25 @@ output$graduation <- renderPlotly({
 
 plotlyOutput("graduation")
 ```
+
+### Unemployment
+
+```{r}
+unemployment_rates_plot <- unemployment_summary_long %>%   
+  ggplot(aes(x = year, y = unemployed_prop, color = label)) +
+  geom_line() + 
+  geom_point() +
+  scale_x_continuous(breaks = scales::pretty_breaks()) +
+  scale_y_continuous(labels = scales::label_percent()) +
+  labs(color = NULL, x = NULL, y = NULL,
+       title = "Unemployment rate",
+       caption = "Data source: 5-year ACS")
+
+# Convert to Plotly
+unemployment_rates_plot %>%
+  ggplotly()
+```
+
 
 
 <!-- Markdown Links -->

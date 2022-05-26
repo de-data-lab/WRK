@@ -203,7 +203,7 @@ selectInput(
 )
 
 actionButton("educationReset",
-             icon = icon("refresh"),
+             icon = icon("fas fa-sync"),
              label = "Reset")
 
 observeEvent(input$educationReset, {

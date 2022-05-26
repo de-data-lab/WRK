@@ -333,7 +333,8 @@ grad_gap_plot <- graduation_gaps %>%
   labs(caption = "Data source: DE Open Data \n 
                   Data points are the aggregates among Brandywine, Christiana, & Colonial School districts.") +
   theme_minimal() +
-  theme(panel.grid = element_blank())
+  theme(panel.grid = element_blank(),
+        plot.margin = margin(1, 2, 1, 2, "cm"))
 
 ```
 
@@ -357,7 +358,8 @@ ggplot(aes(x = year, y = gap_to_Wilmington)) +
   scale_x_continuous(breaks = scales::pretty_breaks()) + 
   labs(caption = "Data source: 5-year ACS") +
   theme_minimal() +
-  theme(panel.grid = element_blank())
+  theme(panel.grid = element_blank(),
+        plot.margin = margin(1, 2, 1, 2, "cm"))
 
 renderPlot({grad_gap_plot + unemployment_plot}, res = 100)
 ```

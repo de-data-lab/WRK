@@ -315,8 +315,8 @@ Row 2: Plots {.tabset .tabset-fade data-height=800}
 grad_gap_plot <- graduation_gaps %>%
   mutate(after_2016 = schoolyear >= 2016) %>%
   ggplot(aes(x = schoolyear, y = gap, color = I(plot_color))) +
-  geom_smooth(method = "lm", se = FALSE,
-              alpha = 0.8, color = "gray") +
+  # geom_smooth(method = "lm", se = FALSE,
+  #             alpha = 0.8, color = "gray") +
   geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
               method = "lm", se = FALSE,
               color = "seagreen2") + 

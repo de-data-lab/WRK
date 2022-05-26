@@ -341,8 +341,8 @@ grad_gap_plot <- graduation_gaps %>%
 ```{r}
 unemployment_plot <- unemployment_summary_wide %>%   
 ggplot(aes(x = year, y = gap_to_Wilmington)) +
-  geom_smooth(method = "lm", se = FALSE,
-              alpha = 0.8, color = "gray") +
+  # geom_smooth(method = "lm", se = FALSE,
+  #             alpha = 0.8, color = "gray") +
   geom_segment(aes(x = year, 
                    xend = year,
                    y = 0, yend = gap_to_Wilmington),

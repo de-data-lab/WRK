@@ -361,7 +361,8 @@ ggplot(aes(x = year, y = gap_to_Wilmington)) +
   theme(panel.grid = element_blank(),
         plot.margin = margin(1, 2, 1, 2, "cm"))
 
-renderPlot({grad_gap_plot + unemployment_plot}, res = 100)
+# Combine two plots and render
+renderPlot({grad_gap_plot + unemployment_plot}, res = 90)
 ```
 
 

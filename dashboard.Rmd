@@ -330,7 +330,8 @@ grad_gap_plot <- graduation_gaps %>%
   guides(color = "none") +
   scale_y_continuous(labels = ~sprintf("%.1f%%", .), limits = c(NA, NA)) + 
   scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(caption = "Data source: DE Open Data \n Data points are the aggregates among Brandywine, Christiana, and Colonial School districts.") +
+  labs(caption = "Data source: DE Open Data \n 
+                  Data points are the aggregates among Brandywine, Christiana, & Colonial School districts.") +
   theme_minimal() +
   theme(panel.grid = element_blank())
 

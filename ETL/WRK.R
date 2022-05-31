@@ -203,6 +203,18 @@ all_combined <- all_combined %>%
   mutate(kinder_ready_tested = round(kinder_ready / kinder_ready_prop, 0),
          kinder_not_ready = kinder_ready_tested - kinder_ready)
 
+# Rearrange the values 
+all_combined <- all_combined %>%
+  select(year, child_milestone_tested, child_milestone, child_milestone_not_achieved, child_miletone_prop,
+         kinder_ready_tested, kinder_ready, kinder_not_ready, kinder_ready_prop,
+         teen_enrolled, teen_ontrack,
+         youth_next_grade, youth_next_grade_prop,
+         everything())
+
+
+# Label the values
+
+
 # Save the combined processed file
 write_rds(all_combined, "data-private/WRK_wide.rds")
 

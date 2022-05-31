@@ -33,7 +33,8 @@ get_edu_data <- function(params = list()){
   query_URL <- URLencode(paste0(base_URL, params_URL))
   raw_data <- fromJSON(query_URL) %>%
     as_tibble() %>%
-    mutate(pctproficient = as.numeric(pctproficient))
+    mutate(pctproficient = as.numeric(pctproficient),
+           schoolyear = as.numeric(schoolyear))
   return(raw_data)
 }
 
@@ -102,7 +103,52 @@ combined_data <- combined_data %>%
     "All Students"
   )))
 
-# Save the processed dataset
-write_rds(combined_data, here("data/processed/education.rds"))
+
+# Save the processed dataset, 
+write_rds(combined_data, here("data/processed/education_achievement.rds"))
+
+# Create a wide dataset, comparing, comparing the gap with the Delaware average
+education_wide <- combined_data %>% 
+  # Disregard grade levels
+  filter(subgroup == "All Students") %>%
+  # Focus on ELA vs. MATH 
+  filter(contentarea %in% c("ELA", "MATH")) %>% 
+  # Only get the relevant variables
+  select(schoolyear, organization, contentarea, pctproficient)
+
+# Label districts
+education_wide <- education_wide %>%
+  mutate(org_label = recode(organization,
+                            "East Side Charter School" = "east_side",
+                            "Edison (Thomas A.) Charter School" = "edison",
+                            "Colonial School District" = "colonial",
+                            "Christina School District" = "christina",
+                            "Brandywine School District" = "brandywine",
+                            "State of Delaware" = "delaware"))
+
+# Pivot to one-year-per-row format
+education_wide <- education_wide %>%
+  select(-organization) %>%
+  pivot_wider(names_from = c(contentarea, org_label),
+              values_from = pctproficient)
+
+# Bring the delaware columns at the end
+education_wide <- education_wide %>%
+  relocate(ends_with("_delaware"), .after = last_col())
+# Save data
+write_rds(education_wide, here("data/processed/education_achievement_wide.rds"))
+
+# Create a table for literacy
+ELA <- education_wide %>%
+  select(schoolyear, starts_with("ELA_")) %>%
+  rename_with(starts_with("ELA_"), .fn = ~str_remove(., "ELA_"))
+## Save data
+write_rds(ELA, here("data/processed/education_achievement_wide_ELA.rds"))
 
 
+# Create a table for math
+math <- education_wide %>%
+  select(schoolyear, starts_with("MATH_")) %>%
+  rename_with(starts_with("MATH_"), .fn = ~str_remove(., "MATH_"))
+## Save data
+write_rds(math, here("data/processed/education_achievement_wide_math.rds"))

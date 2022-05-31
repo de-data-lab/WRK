@@ -179,36 +179,36 @@ renderPlot({
 
 # Education
 ```{r}
-kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
-DE_kinder <- kinder_readiness_DE_wide %>%
-  transmute(year = TimeFrame,location = Location,
-            kinder_ready_prop = mean)
-
-WRK_wide <- 
-  read_rds(here("data/processed/WRK_wide.rds"))
-
-WRK_kinder <- WRK_wide %>%
-  transmute(year = year, location = "WRK",
-            kinder_ready_prop = kinder_ready_prop)
-
-all_kinder <- DE_kinder %>%
-  bind_rows(WRK_kinder)
-
-# Calculate the readiness average over years 
-kinder_WRK_DE_comparison <- all_kinder %>%
-  group_by(location) %>%
-  summarise(mean = mean(kinder_ready_prop))
-
-# Create a text vector for printing out
-kinder_txt <- kinder_WRK_DE_comparison %>%
-  mutate(mean = sprintf("%.1f%%", mean * 100)) %>%
-  deframe() %>% as.list()
-
-# Calculate percentage increase between two perccentages
-kinder_WRK_DE_comparison_list <- kinder_WRK_DE_comparison %>%
-  deframe() %>% as.list()
-kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison_list$Delaware) / 
-  kinder_WRK_DE_comparison_list$Delaware 
+# kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
+# DE_kinder <- kinder_readiness_DE_wide %>%
+#   transmute(year = TimeFrame,location = Location,
+#             kinder_ready_prop = mean)
+# 
+# WRK_wide <- 
+#   read_rds(here("data/processed/WRK_wide.rds"))
+# 
+# WRK_kinder <- WRK_wide %>%
+#   transmute(year = year, location = "WRK",
+#             kinder_ready_prop = kinder_ready_prop)
+# 
+# all_kinder <- DE_kinder %>%
+#   bind_rows(WRK_kinder)
+# 
+# # Calculate the readiness average over years 
+# kinder_WRK_DE_comparison <- all_kinder %>%
+#   group_by(location) %>%
+#   summarise(mean = mean(kinder_ready_prop))
+# 
+# # Create a text vector for printing out
+# kinder_txt <- kinder_WRK_DE_comparison %>%
+#   mutate(mean = sprintf("%.1f%%", mean * 100)) %>%
+#   deframe() %>% as.list()
+# 
+# # Calculate percentage increase between two perccentages
+# kinder_WRK_DE_comparison_list <- kinder_WRK_DE_comparison %>%
+#   deframe() %>% as.list()
+# kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison_list$Delaware) / 
+#   kinder_WRK_DE_comparison_list$Delaware 
 ```
 
 
@@ -242,7 +242,7 @@ Row 1: Summary  {data-height=200}
 ### More kindergarten-ready than Delaware average 
 
 ```{r}
-valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
+# valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
 ```
 
 ### Improvement in literacy gap to Delaware
@@ -317,7 +317,7 @@ Row 2: Proficiency  {.tabset .tabset-fade data-height=800}
 ### Summary
 
 #### Kindergarten Readiness
-- On average, `r kinder_txt["WRK"]` of children in WRK group were kindergarten ready (2019-2021), compared to `r kinder_txt["Delaware"]` of children in Delaware (2016-2019). The rate of kindergarden readiness in WRK group is `r print_pct(kinder_pct_diff)` more than that of Delaware.
+<!-- - On average, `r #kinder_txt["WRK"]` of children in WRK group were kindergarten ready (2019-2021), compared to `r #kinder_txt["Delaware"]` of children in Delaware (2016-2019). The rate of kindergarden readiness in WRK group is `r #print_pct(kinder_pct_diff)` more than that of Delaware. -->
 
 #### Literacy Levlels
 
@@ -348,18 +348,18 @@ improved by `r gap_yearly_change_2016` per year from 2016 to 2020.
 ### Kindergarten Readiness
 ```{r}
 # Delaware Average 
-all_kinder %>%
-  ggplot(aes(x = year, y = kinder_ready_prop, color = location)) + 
-  geom_line() +
-  geom_point() + 
-  scale_y_continuous(labels = scales::label_percent()) +
-  annotate("text", x = 2020, y = 0.75, label = "WRK") + 
-  annotate("text", x = 2017, y = 0.65, label = "Delaware") + 
-  labs(title = "Children ready for kindergarten",
-       x = NULL, y = NULL,
-       caption = "Source: KidsCount",
-       color = NULL) +
-  theme_minimal()
+# all_kinder %>%
+#   ggplot(aes(x = year, y = kinder_ready_prop, color = location)) + 
+#   geom_line() +
+#   geom_point() + 
+#   scale_y_continuous(labels = scales::label_percent()) +
+#   annotate("text", x = 2020, y = 0.75, label = "WRK") + 
+#   annotate("text", x = 2017, y = 0.65, label = "Delaware") + 
+#   labs(title = "Children ready for kindergarten",
+#        x = NULL, y = NULL,
+#        caption = "Source: KidsCount",
+#        color = NULL) +
+#   theme_minimal()
 ```
 
 ### Literacy Achievement

@@ -15,7 +15,8 @@ kinder_readiness_DE <- read_xlsx(temp_data)
 
 # Convert the data to numeric
 kinder_readiness_DE <- kinder_readiness_DE %>%
-  mutate(Data = as.numeric(Data))
+  mutate(Data = as.numeric(Data)) %>%
+  mutate(TimeFrame = as.numeric(TimeFrame))
 
 # Save the file 
 write_rds(kinder_readiness_DE, here("data/processed/", "education_kinder_readiness_long.rds"))
@@ -32,4 +33,4 @@ kinder_readiness_DE_wide <- kinder_readiness_DE_wide %>%
   ungroup()
 
 # Save the file
-write_rds(kinder_readiness_DE, here("data/processed/", "education_kinder_readiness_wide.rds"))
+write_rds(kinder_readiness_DE_wide, here("data/processed/", "education_kinder_readiness_wide.rds"))

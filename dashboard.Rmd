@@ -60,7 +60,7 @@ hud_var_def <- hud_vars_df %>%
   deframe()
 ```
 
-# Housing
+# Housing {data-orientation=columns}
 ```{r}
 # New available units for rent
 # Calculate the Riverside metrics
@@ -109,7 +109,7 @@ pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]
 ```
 
 
-Row 1: Summaries
+Column 1: Available Rental Units
 -----------------------------------------------------------------------
 ### Change in available units for rent
 
@@ -120,6 +120,38 @@ total_units_change_box_text <- riverside_total_units_coef %>%
 
 valueBox(total_units_change_box_text, icon = "fa-building")
 ```
+
+
+### Available rental units
+```{r}
+# Create a plot for 
+riverside_rental_units_plot <- riverside_total_units %>%
+  ggplot(aes(x = year, y = total_units)) +
+  geom_col(fill = tech_impact_colors("ti_blue")) +
+  labs(title = "Rental units available in Riverside",
+       y = NULL, x = NULL) +
+  theme_minimal()
+
+riverside_rental_changes_plot <- riverside_total_units %>%
+  drop_na(pct_change) %>%
+  ggplot(aes(x = year, y = pct_change)) + 
+  geom_line(color = tech_impact_colors("ti_blue")) + 
+  geom_point(color = tech_impact_colors("ti_blue")) +
+  scale_y_continuous(labels = ~paste0(., "%"),
+                     breaks = scales::breaks_pretty()) +
+  labs(title = "Changes in available units",
+       y = NULL, x = NULL) +
+  theme_minimal()
+```
+
+```{r}
+renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
+           res = 80)
+```
+
+
+Column 2: Occupied units
+-----------------------------------------------------------------------
 
 ### Average change in proportion of occupied units
 
@@ -136,6 +168,30 @@ valueBox(pct_occupied_box_text,
          icon = "fas fa-house-user", 
          color = pct_occupied_color)
 ```
+
+### Occupied Units
+
+```{r}
+pct_occupied_plot <- pct_occupied_joined %>%
+  ggplot(aes(x = year, y = pct_occupied, color = location)) +
+  geom_point() + 
+  geom_line() +
+  annotate("text", x = 2018, y = 97, label = "Riverside",
+           color = tech_impact_colors("ti_blue")) +
+  annotate("text", x = 2020, y = 92, label = "Delaware",
+           color = tech_impact_colors("ti_orange")) +
+  scale_y_continuous(labels = ~paste0(., "%")) +
+  labs(title = "Units occupied by renters", x = NULL, y = NULL) + 
+  guides(color = "none") +
+  theme_minimal() +
+  scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev())
+
+renderPlot({pct_occupied_plot}, res = 100)
+```
+
+
+Column 3: Months since move-in
+-----------------------------------------------------------------------
 
 ### Average months since moved in
 
@@ -169,57 +225,6 @@ riverside_tenure_text <- riverside_tenure_coef %>%
 
 valueBox(riverside_tenure_text, icon = "fas fa-calendar-alt")
 ```
-
-Row 2: Visuals
------------------------------------------------------------------------
-
-### Available rental units
-```{r}
-# Create a plot for 
-riverside_rental_units_plot <- riverside_total_units %>%
-  ggplot(aes(x = year, y = total_units)) +
-  geom_col(fill = tech_impact_colors("ti_blue")) +
-  labs(title = "Rental units available in Riverside",
-       y = NULL, x = NULL) +
-  theme_minimal()
-
-riverside_rental_changes_plot <- riverside_total_units %>%
-  drop_na(pct_change) %>%
-  ggplot(aes(x = year, y = pct_change)) + 
-  geom_line(color = tech_impact_colors("ti_blue")) + 
-  geom_point(color = tech_impact_colors("ti_blue")) +
-  scale_y_continuous(labels = ~paste0(., "%"),
-                     breaks = scales::breaks_pretty()) +
-  labs(title = "Changes in available units",
-       y = NULL, x = NULL) +
-  theme_minimal()
-```
-
-```{r}
-renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
-           res = 80)
-```
-
-### Occupied Units
-
-```{r}
-pct_occupied_plot <- pct_occupied_joined %>%
-  ggplot(aes(x = year, y = pct_occupied, color = location)) +
-  geom_point() + 
-  geom_line() +
-  annotate("text", x = 2018, y = 97, label = "Riverside",
-           color = tech_impact_colors("ti_blue")) +
-  annotate("text", x = 2020, y = 92, label = "Delaware",
-           color = tech_impact_colors("ti_orange")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  labs(title = "Units occupied by renters", x = NULL, y = NULL) + 
-  guides(color = "none") +
-  theme_minimal() +
-  scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev())
-
-renderPlot({pct_occupied_plot}, res = 100)
-```
-
 
 ### Average months since moved in
 

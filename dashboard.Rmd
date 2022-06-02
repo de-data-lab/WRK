@@ -304,8 +304,11 @@ graduation_gaps_lm_2016 <- graduation_gaps %>%
   filter(schoolyear >= 2016) %>%
   lm(data = .,
    formula  = gap ~ schoolyear)
-gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"] %>%
+gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"]
+
+gap_yearly_change_2016_txt <- gap_yearly_change_2016 %>%
   sprintf("%.2f%%", .)
+  
 ```
 
 
@@ -373,7 +376,7 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 
 ```{r}
 # Render value box
-valueBox(print_pct(eastside_ELA_gap_coeff/100) %>% paste0("/year"), icon = "fa-book-open")
+valueBox(eastside_ELA_gap_coeff %>% sprintf("%+.1f%%/year", .), icon = "fa-book-open")
 
 ```
 
@@ -430,7 +433,7 @@ eastside_math_gap_coeff <- eastside_math_lm$coefficients[["schoolyear"]]
 ```
 
 ```{r}
-valueBox(print_pct(eastside_math_gap_coeff / 100) %>% paste0("/year"), icon = "fas fa-calculator")
+valueBox(eastside_math_gap_coeff %>% sprintf("%+.1f%%/year", .), icon = "fas fa-calculator")
 
 ```
 
@@ -470,7 +473,7 @@ Column 4: Graduation Rate
 ### Improvement in high school graduation gap to Delaware, since 2016 {data-height=100}
 
 ```{r}
-valueBox(gap_yearly_change_2016 %>% paste0("/year"), icon = "fa-graduation-cap")
+valueBox(gap_yearly_change_2016 %>% sprintf("%+.1f%%/year", .), icon = "fa-graduation-cap")
 ```
 
 
@@ -514,7 +517,7 @@ renderPlot({grad_gap_plot}, res = 80)
 state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  
 
 - However, if we focus on 2016 onwards, the gap may be improving. On average, the gap
-improved by `r gap_yearly_change_2016` per year from 2016 to 2020.
+improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 
 

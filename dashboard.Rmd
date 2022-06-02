@@ -58,6 +58,10 @@ names(hud_vars) <- hud_vars_df$label
 hud_var_def <- hud_vars_df %>%
   select(variable, definition) %>%
   deframe()
+
+
+# Set ggplot global theme
+theme_set(theme_minimal())
 ```
 
 # Housing

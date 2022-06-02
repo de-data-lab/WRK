@@ -536,7 +536,6 @@ unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemploymen
 <!-- ----------------------------------------------------------------------- -->
 <!-- ### Workforce Development -->
 
-```
 
 <!-- #### Data Sources -->
 <!-- - [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn) -->
@@ -630,6 +629,223 @@ unemployment_rates_plot <- unemployment_summary_long %>%
 # Convert to Plotly
 unemployment_rates_plot %>%
   ggplotly()
+```
+
+# Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
+
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+### Outcome
+```{r}
+
+selectInput("selectedOutcome", label = NULL, 
+            choices = hud_vars)
+renderText({
+    hud_var_def[[input$selectedOutcome]]
+  })
+```
+
+
+
+```{r}
+selectInput("summaryMethod", label = h3("Summary Method"),
+            choices = c("Sum" = "sum", "Average" = "mean"))
+```
+
+#### Potentially-Relevant Outcomes
+
+- % Occupied
+- % Moved past year
+- Average months since move-in
+
+
+Row 1
+-----------------------------------------------------------------------
+
+### Delaware
+```{r}
+renderPlot({
+  
+  selectedOutcome <- sym(input$selectedOutcome)
+
+  hud_de %>%
+    plot_bar(outcome = input$selectedOutcome,
+             method = input$summaryMethod,
+             y_lab = names(which(hud_vars == input$selectedOutcome)))
+  
+})
+```
+
+
+### 3 Tracts Combined
+
+```{r}
+renderPlot({
+  
+  selectedOutcome <- sym(input$selectedOutcome)
+
+  hud_de %>%
+    filter(code %in% target_tracts) %>%
+    plot_bar(outcome = input$selectedOutcome,
+             method = input$summaryMethod,
+             y_lab = names(which(hud_vars == input$selectedOutcome)))
+  
+})
+```
+
+
+Row 2
+-----------------------------------------------------------------------
+
+
+### [CT30.02 (Riverside)][CT3002]
+
+```{r}
+renderPlot({
+  
+  selectedOutcome <- sym(input$selectedOutcome)
+
+  hud_de %>%
+    filter(code == "10003003002") %>%
+    ggplot(aes(x = year, y = !!selectedOutcome)) +
+    geom_plot_col +
+    ylab(names(which(hud_vars == input$selectedOutcome)))
+  
+})
+```
+
+
+### [CT 6.01 (Eastlake/Eastlawn)][CT601]
+
+```{r}
+renderPlot({
+  
+  selectedOutcome <- sym(input$selectedOutcome)
+
+  hud_de %>%
+    filter(code == "10003000601") %>%
+    ggplot(aes(x = year, y = !!selectedOutcome)) +
+    geom_plot_col +
+    ylab(names(which(hud_vars == input$selectedOutcome)))
+  
+})
+```
+
+
+### [CT 6.02 (Northeast)][CT602]
+
+```{r}
+renderPlot({
+  
+  selectedOutcome <- sym(input$selectedOutcome)
+
+  hud_de %>%
+    filter(code == "10003000602") %>%
+    ggplot(aes(x = year, y = !!selectedOutcome)) +
+   geom_plot_col +
+    ylab(names(which(hud_vars == input$selectedOutcome)))
+
+  
+})
+```
+
+# Education {data-navmenu="Details" data-icon="fa-graduation-cap" data-orientation=rows}
+
+Row 1
+-----------------------------------------------------------------------
+
+### Achievement Details
+
+:::: {#achievement-container .d-flex .flex-row}
+
+::: {#achievement-controls .d-flex .flex-column}
+```{r}
+# Input
+default_contentareas <- c("ELA", "MATH")
+selectInput(
+  inputId = "contentareas",
+  label = "Content Areas", 
+  choices = contentareas,
+  multiple = TRUE,
+  selected = default_contentareas
+)
+
+# Select groups
+default_groups <- c("State of Delaware", "East Side Charter School")
+selectInput(
+  inputId = "groups",
+  label = "Groups", 
+  choices = rev(groups),
+  multiple = TRUE,
+  selected = default_groups
+)
+
+# Select grades to plot, defaults to All Students only
+selectInput(
+  inputId = "ach_grades",
+  label = "Grades",
+  choices = c("3rd Grade",
+    "4th Grade",
+    "5th Grade",
+    "6th Grade",
+    "7th Grade",
+    "8th Grade",
+    "All Students"),
+  multiple = TRUE,
+  selected = "All Students"
+)
+
+actionButton("educationReset",
+             icon = icon("fas fa-sync"),
+             label = "Reset",
+             class = "btn btn-secondary btn-sm align-self-center")
+
+# Observe event for action button and reset to default 
+observeEvent(input$educationReset, {
+  updateSelectInput(session, "contentareas", selected = default_contentareas)
+  updateSelectInput(session, "groups", selected = default_groups)
+  return (NULL)
+})
+```
+:::
+
+
+```{r}
+output$plot <- renderPlotly({
+  plot_achievement(selected_contentarea = input$contentareas,
+                   selected_orgs = input$groups,
+                   selected_grades = input$ach_grades) %>%
+    ggplotly(tooltip = c("y", "x", "colour"), dynamicTicks = FALSE)
+})
+
+plotlyOutput("plot")
+```
+
+
+:::: 
+
+Row 2
+-----------------------------------------------------------------------
+
+### Graduation rate
+```{r}
+output$graduation <- renderPlotly({
+  out_plot <- graduation %>% 
+    ggplot(aes(x = schoolyear, y = pctgraduates,
+               color = organization, group = organization)) +
+    geom_line() +
+    geom_point() +
+    facet_grid(. ~ ratetype) +
+    scale_y_continuous(labels = ~paste0(., "%")) +
+    ylab(NULL) +
+    xlab(NULL) + 
+    labs(color = NULL) + 
+    ggtitle("High school graduation rate")
+  
+    return(ggplotly(out_plot))
+})
+
+plotlyOutput("graduation")
 ```
 
 

@@ -24,6 +24,7 @@ library(patchwork)
 source(here("utils/utils.R"))
 source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
+source(here("utils/tech_impact_colors.R"))
 
 
 ## Load HUD Data 
@@ -59,7 +60,192 @@ hud_var_def <- hud_vars_df %>%
   deframe()
 ```
 
-# Housing {.tabsets}
+# Housing
+```{r}
+# New available units for rent
+# Calculate the Riverside metrics
+riverside_total_units <- hud_de %>%
+  filter(code == "10003003002") %>%
+  select(year, total_units) %>%
+  mutate(total_units_lag = lag(total_units)) %>%
+  # Calculate the percent change
+  mutate(pct_change = ((total_units/lag(total_units) - 1)) * 100)
+# Mean percent change across years
+riverside_total_units_pct_change_mean <- riverside_total_units %>%
+  summarise(mean = mean(pct_change, na.rm = TRUE))
+
+# Get the average number of units changed
+riverside_total_units_lm <- riverside_total_units %>%
+  lm(data = ., total_units ~ year)
+riverside_total_units_coef <- coef(riverside_total_units_lm)[["year"]]
+
+  
+## Proportions of units occupied 
+# Calculate the Riverside metrics
+riverside_pct_occupied <- hud_de %>%
+  filter(code == "10003003002") %>%
+  transmute(year, pct_occupied, total_units) %>%
+  mutate(location = "Riverside")
+
+# Calcualate the Delaware average
+DE_pct_occupied <- hud_de %>%
+  group_by(year) %>%
+  summarise(pct_occupied = mean(pct_occupied, na.rm = TRUE)) %>%
+  mutate(location = "Delaware")
+
+# Join the tables 
+pct_occupied_joined <- riverside_pct_occupied %>%
+  bind_rows(DE_pct_occupied)
+
+# Calculate the average year-to-year change in pct_occupied
+pct_occupied_joined_lm <- riverside_pct_occupied %>%
+  lm(data = ., pct_occupied ~ year)
+## If we are adjusting for the total_units:
+# pct_occupied_joined_lm <- riverside_pct_occupied %>%
+#   lm(data = ., pct_occupied ~ year + total_units)  
+
+# Get the coefficient 
+pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]
+```
+
+
+Row 1: Summaries
+-----------------------------------------------------------------------
+### Change in available units for rent
+
+```{r}
+total_units_change_box_text <- riverside_total_units_coef %>%
+  round(1) %>%
+  paste0("/year")
+
+valueBox(total_units_change_box_text, icon = "fa-building")
+```
+
+### Average change in proportion of occupied units
+
+```{r}
+# Get the text to be rendered
+pct_occupied_box_text <- pct_occupied_riverside_change %>% 
+  round(1) %>%
+  paste0("%/year")
+# Change color of the infobox depending on direction
+pct_occupied_color <- case_when(pct_occupied_riverside_change >= 0 ~ "success",
+                                TRUE ~ "warning")
+# Render the valuebox
+valueBox(pct_occupied_box_text,
+         icon = "fas fa-house-user", 
+         color = pct_occupied_color)
+```
+
+### Average months since moved in
+
+```{r}
+# Average months since moved in
+riverside_tenure <- hud_de %>%
+    filter(code == "10003003002") %>%
+  select(year, months_from_movein, pct_occupied, total_units) %>%
+  mutate(location = "riverside")
+
+DE_tenure <- hud_de %>%
+  group_by(year) %>%
+  summarise(months_from_movein = mean(months_from_movein, na.rm = TRUE),
+            pct_occupied = mean(pct_occupied, na.rm = TRUE),
+            total_units = mean(total_units, na.rm = TRUE)) %>%
+  mutate(location = "DE")
+
+# Combine the Riverside and DE data
+tenure_stacked <- riverside_tenure %>%
+  bind_rows(DE_tenure)
+
+# Calculate the average change in tenure for Riverside
+riverside_tenure_lm <- riverside_tenure %>%
+  lm(data = ., months_from_movein ~ year)
+
+riverside_tenure_coef <- coef(riverside_tenure_lm)[["year"]]
+
+riverside_tenure_text <- riverside_tenure_coef %>%
+  round(1) %>%
+  sprintf("%+.1fmo/year", .)
+
+valueBox(riverside_tenure_text, icon = "fas fa-calendar-alt")
+```
+
+Row 2: Visuals
+-----------------------------------------------------------------------
+
+### Available rental units
+```{r}
+# Create a plot for 
+riverside_rental_units_plot <- riverside_total_units %>%
+  ggplot(aes(x = year, y = total_units)) +
+  geom_col(fill = tech_impact_colors("ti_blue")) +
+  labs(title = "Rental units available in Riverside",
+       y = NULL, x = NULL) +
+  theme_minimal()
+
+riverside_rental_changes_plot <- riverside_total_units %>%
+  drop_na(pct_change) %>%
+  ggplot(aes(x = year, y = pct_change)) + 
+  geom_line(color = tech_impact_colors("ti_blue")) + 
+  geom_point(color = tech_impact_colors("ti_blue")) +
+  scale_y_continuous(labels = ~paste0(., "%"),
+                     breaks = scales::breaks_pretty()) +
+  labs(title = "Changes in available units",
+       y = NULL, x = NULL) +
+  theme_minimal()
+```
+
+```{r}
+renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
+           res = 80)
+```
+
+### Occupied Units
+
+```{r}
+pct_occupied_plot <- pct_occupied_joined %>%
+  ggplot(aes(x = year, y = pct_occupied, color = location)) +
+  geom_point() + 
+  geom_line() +
+  annotate("text", x = 2018, y = 97, label = "Riverside",
+           color = tech_impact_colors("ti_blue")) +
+  annotate("text", x = 2020, y = 92, label = "Delaware",
+           color = tech_impact_colors("ti_orange")) +
+  scale_y_continuous(labels = ~paste0(., "%")) +
+  labs(title = "Units occupied by renters", x = NULL, y = NULL) + 
+  guides(color = "none") +
+  theme_minimal() +
+  scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev())
+
+renderPlot({pct_occupied_plot}, res = 100)
+```
+
+
+### Average months since moved in
+
+```{r}
+tenure_plot <- tenure_stacked %>%
+  ggplot(aes(x = year, y = months_from_movein,
+             color = location)) + 
+  geom_line() + 
+  geom_point() +
+    scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev()) +
+    annotate("text", x = 2018, y = 110, label = "Riverside",
+           color = tech_impact_colors("ti_blue")) +
+  annotate("text", x = 2020, y = 105, label = "Delaware",
+           color = tech_impact_colors("ti_orange")) +
+  theme_minimal() + 
+  labs(x = NULL, y = NULL,
+       title = "Months since moved in") +
+  guides(color = "none")
+
+renderPlot({tenure_plot}, res = 100)
+
+```
+
+
+
+# Housing (Details)
 
 Inputs {.sidebar}
 -----------------------------------------------------------------------

@@ -535,7 +535,6 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
 unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
 unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
-
 ```
 
 Row 1: Summary {data-height=300}
@@ -557,7 +556,6 @@ unemployment_gaps_yearly_change_2017 <- sprintf(fmt = "%.1f%%", unemployment_gap
 ### Unemployment gaps to Wilmington 
 ```{r}
 valueBox("XXX", icon = "fa-pencil")
-
 ```
 
 

@@ -532,30 +532,15 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 ```{r}
 # Load Data
-
 unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
 unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
 unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
 
 ```
 
-
-<!-- Sidebar {.sidebar} -->
-<!-- ----------------------------------------------------------------------- -->
-<!-- ### Workforce Development -->
-
-
-<!-- #### Data Sources -->
-<!-- - [Delaware Open Data - Student Graduation](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn) -->
-
-
-
-
 Row 1: Summary {data-height=300}
 -----------------------------------------------------------------------
 ```{r}
-
-
 # Unemployment 
 unemployment_gaps_lm <- lm(data = unemployment_summary_wide,
                            formula = gap_to_Wilmington ~ year)

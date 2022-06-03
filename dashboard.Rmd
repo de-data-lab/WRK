@@ -549,13 +549,18 @@ unemployment_end_year <-  unemployment_gaps_lm$model$year %>% max()
 unemployment_gaps_lm_2017 <- unemployment_summary_wide %>%
   filter(year >= 2017) %>%
   lm(data = ., formula = gap_to_Wilmington ~ year)
-unemployment_gaps_yearly_change_2017 <- sprintf(fmt = "%.1f%%", unemployment_gaps_lm_2017$coefficients["year"] * 100)
+unemployment_gaps_yearly_change_2017 <- unemployment_gaps_lm_2017$coefficients["year"] * 100
 ```
 
 
 ### Unemployment gaps to Wilmington, since 2017 {data-height=100}
 ```{r}
-valueBox("XXX", icon = "fa-pencil")
+unemployment_box_color <- case_when(unemployment_gaps_yearly_change_2017 >= 0 ~ "warning",
+                                    unemployment_gaps_yearly_change_2017 < 0 ~ "success")
+unemployment_text <- unemployment_gaps_yearly_change_2017 %>%
+  sprintf(fmt = "%+.1f%%", .)
+valueBox(unemployment_text, icon = "fa-briefcase",
+         color = unemployment_box_color)
 ```
 
 
@@ -563,24 +568,24 @@ valueBox("XXX", icon = "fa-pencil")
 ```{r}
 # Create the plot for unemployment gap against Wilmington
 unemployment_plot <- unemployment_summary_wide %>%   
-ggplot(aes(x = year, y = gap_to_Wilmington)) +
+  ggplot(aes(x = year, y = gap_to_Wilmington)) +
   geom_segment(aes(x = year, 
                    xend = year,
                    y = 0, yend = gap_to_Wilmington),
                size = 1.2,
-               color = "#FBB4AE") + 
-  geom_point(size = 5, color = "#FBB4AE") +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  labs(y = NULL,
-       x = NULL,
+               color = tech_impact_colors("ti_orange")) + 
+  geom_point(size = 5, color = tech_impact_colors("ti_orange")) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = tech_impact_colors("ti_blue")) +
+  annotate("text", label = "Delaware average", x = 2011.5, y = -0.01,
+           color = tech_impact_colors("ti_blue")) + 
+  labs(y = NULL, x = NULL,
        title = "Gaps in unemployment rate vs. Wilmington",
        color = NULL) +
-  scale_y_continuous(labels = scales::label_percent(), limits = c(NA, NA)) + 
+  scale_y_continuous(labels = scales::label_percent()) + 
   scale_x_continuous(breaks = scales::pretty_breaks()) + 
   labs(caption = "Data source: 5-year ACS") +
-  theme_minimal() +
-  theme(panel.grid = element_blank(),
-        plot.margin = margin(1, 2, 1, 2, "cm"))
+  theme_minimal()
 
 # Combine two plots and render
 renderPlot({unemployment_plot}, res = 90)
@@ -598,7 +603,8 @@ unemployment_rates_plot <- unemployment_summary_long %>%
   scale_y_continuous(labels = scales::label_percent()) +
   labs(color = NULL, x = NULL, y = NULL,
        title = "Unemployment rate",
-       caption = "Data source: 5-year ACS")
+       caption = "Data source: 5-year ACS") + 
+      scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange", "ti_green")) %>% rev())
 
 # Convert to Plotly
 unemployment_rates_plot %>%

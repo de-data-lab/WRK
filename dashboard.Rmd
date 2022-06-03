@@ -528,7 +528,7 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 
 
-# Workforce Development
+# Workforce Development {data-orientation=columns}
 
 ```{r}
 # Load Data
@@ -537,7 +537,7 @@ unemployment_summary_long <- read_rds(here("data/processed/workforce_unemploymen
 unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
 ```
 
-Row 1: Summary {data-height=300}
+Column 1: Unemployment
 -----------------------------------------------------------------------
 ```{r}
 # Unemployment 
@@ -553,31 +553,15 @@ unemployment_gaps_yearly_change_2017 <- sprintf(fmt = "%.1f%%", unemployment_gap
 ```
 
 
-### Unemployment gaps to Wilmington 
+### Unemployment gaps to Wilmington, since 2017 {data-height=100}
 ```{r}
 valueBox("XXX", icon = "fa-pencil")
 ```
 
 
-### Unemployment
-
-#### Unemployment
-
-- The gaps to the Wilmington's unemployment rate were improving on average
-by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year` to `r unemployment_end_year`
-
-- However, the gaps are worsening since 2017 by `r unemployment_gaps_yearly_change_2017` per year.
-
-
-
-Row 2: Plots {.tabset .tabset-fade data-height=800}
------------------------------------------------------------------------
-
-### Summary
-
-
-
+### {-}
 ```{r}
+# Create the plot for unemployment gap against Wilmington
 unemployment_plot <- unemployment_summary_wide %>%   
 ggplot(aes(x = year, y = gap_to_Wilmington)) +
   geom_segment(aes(x = year, 
@@ -603,8 +587,7 @@ renderPlot({unemployment_plot}, res = 90)
 ```
 
 
-
-### Unemployment
+### {-}
 
 ```{r}
 unemployment_rates_plot <- unemployment_summary_long %>%   
@@ -621,6 +604,14 @@ unemployment_rates_plot <- unemployment_summary_long %>%
 unemployment_rates_plot %>%
   ggplotly()
 ```
+
+### Notes {data-height=150}
+
+- The gaps to the Wilmington's unemployment rate were improving on average
+by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year` to `r unemployment_end_year`
+
+- However, the gaps are worsening since 2017 by `r unemployment_text` per year.
+
 
 # Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
 

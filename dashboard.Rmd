@@ -577,7 +577,7 @@ unemployment_plot <- unemployment_summary_wide %>%
   geom_point(size = 5, color = tech_impact_colors("ti_orange")) +
   geom_hline(yintercept = 0, linetype = "dashed",
              color = tech_impact_colors("ti_blue")) +
-  annotate("text", label = "Delaware average", x = 2011.5, y = -0.01,
+  annotate("text", label = "Wilmington average", x = 2011.5, y = -0.005,
            color = tech_impact_colors("ti_blue")) + 
   labs(y = NULL, x = NULL,
        title = "Gaps in unemployment rate vs. Wilmington",

@@ -198,7 +198,7 @@ pct_occupied_plot <- pct_occupied_joined %>%
                   font = list(color = tech_impact_colors("ti_blue"),
                               size = 14),
                   showarrow = FALSE) %>% 
-  add_annotations(x = 2020, y = 92,
+  add_annotations(x = 2020, y = 91,
                   text = "Delaware",
                   font = list(color = tech_impact_colors("ti_orange"),
                               size = 14),

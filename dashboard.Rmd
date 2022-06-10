@@ -203,6 +203,11 @@ pct_occupied_plot <- pct_occupied_joined %>%
                   font = list(color = tech_impact_colors("ti_orange"),
                               size = 14),
                   showarrow = FALSE) %>% 
+  # Add caption 
+  add_annotations(x = 1, y = -0.06,
+                  text = "Source: <a href='https://www.huduser.gov/portal/datasets/assthsg.html' target='_blank'>HUD</a>",
+                  showarrow = FALSE, xref ="paper", yref = "paper", 
+                  xanchor = "right", yanchor = "auto") %>%
   # Remove axis labels since they are obvious
   # Add "%" suffix to the y-axis
   layout(yaxis = list(title = "",

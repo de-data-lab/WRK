@@ -25,6 +25,7 @@ source(here("utils/utils.R"))
 source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
 source(here("utils/tech_impact_colors.R"))
+source(here("utils/plotly_utils.R"))
 
 
 ## Load HUD Data 
@@ -94,7 +95,8 @@ riverside_pct_occupied <- hud_de %>%
 # Calcualate the Delaware average
 DE_pct_occupied <- hud_de %>%
   group_by(year) %>%
-  summarise(pct_occupied = mean(pct_occupied, na.rm = TRUE)) %>%
+  summarise(pct_occupied = mean(pct_occupied, na.rm = TRUE),
+            total_units = sum(number_reported, na.rm = TRUE)) %>%
   mutate(location = "Delaware")
 
 # Join the tables 
@@ -176,21 +178,49 @@ valueBox(pct_occupied_box_text,
 ### Occupied Units
 
 ```{r}
-pct_occupied_plot <- pct_occupied_joined %>%
-  ggplot(aes(x = year, y = pct_occupied, color = location)) +
-  geom_point() + 
-  geom_line() +
-  annotate("text", x = 2018, y = 97, label = "Riverside",
-           color = tech_impact_colors("ti_blue")) +
-  annotate("text", x = 2020, y = 92, label = "Delaware",
-           color = tech_impact_colors("ti_orange")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  labs(title = "Units occupied by renters", x = NULL, y = NULL) + 
-  guides(color = "none") +
-  theme_minimal() +
-  scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev())
+# Generate a hovertext for plotting  
+pct_occupied_joined <- pct_occupied_joined %>%
+  mutate(hovertext = str_glue("{round(pct_occupied, 1)}% of units in {location} were occupied in {year} \n (Out of {total_units} units)"))
 
-renderPlot({pct_occupied_plot}, res = 100)
+# Create a plotly plot
+pct_occupied_plot <- pct_occupied_joined %>%
+  plot_ly(x = ~year, y = ~pct_occupied, text = ~location) %>%
+  add_trace(type = "scatter", 
+            mode = "markers+lines",
+            color = ~location,
+            hoveron = "points",
+            hovertext = ~hovertext,
+            hoverinfo = "text",
+            colors = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev()) %>%
+  # Add annotations for Riverside vs. Wilmington
+  add_annotations(x = 2018, y = 97,
+                  text = "Riverside",
+                  font = list(color = tech_impact_colors("ti_blue"),
+                              size = 14),
+                  showarrow = FALSE) %>% 
+  add_annotations(x = 2020, y = 91,
+                  text = "Delaware",
+                  font = list(color = tech_impact_colors("ti_orange"),
+                              size = 14),
+                  showarrow = FALSE) %>% 
+  # Add caption 
+  add_annotations(x = 1, y = -0.06,
+                  text = "Source: <a href='https://www.huduser.gov/portal/datasets/assthsg.html' target='_blank'>HUD</a>",
+                  showarrow = FALSE, xref ="paper", yref = "paper", 
+                  xanchor = "right", yanchor = "auto") %>%
+  # Remove axis labels since they are obvious
+  # Add "%" suffix to the y-axis
+  layout(yaxis = list(title = "",
+                      ticksuffix = "%"),
+         xaxis = list(title = ""),
+         title = list(text = "Rental units occupied (%)",
+                      xanchor = "left", x = 0)) %>% 
+  hide_legend() %>% 
+  plotly_hide_modebar() %>%
+  plotly_disable_zoom() 
+
+# Render Plot
+renderPlotly({pct_occupied_plot })
 ```
 
 

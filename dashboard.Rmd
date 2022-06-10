@@ -213,7 +213,8 @@ pct_occupied_plot <- pct_occupied_joined %>%
   layout(yaxis = list(title = "",
                       ticksuffix = "%"),
          xaxis = list(title = ""),
-         title = "Rental units occupied (%)") %>% 
+         title = list(text = "Rental units occupied (%)",
+                      xanchor = "left", x = 0)) %>% 
   hide_legend() %>% 
   plotly_hide_modebar() %>%
   plotly_disable_zoom() 

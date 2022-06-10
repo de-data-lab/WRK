@@ -68,7 +68,7 @@ all_calendars_df <- all_calendars_df %>%
 event_names <- all_calendars_df %>%
   transmute(event_name = EventName) %>%
   distinct() %>%
-  dplyr::arrange(event_name)
+  arrange(event_name)
 
 # Save the unique event names
 write_csv(event_names, here("data/processed/", "event_names_to_code.csv"))

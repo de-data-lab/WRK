@@ -6,7 +6,9 @@ output:
     vertical_layout: fill
     theme: 
       version: 4
-      bootswatch: cosmo
+      primary: "#0c8ccd" #blue
+      warning: "#ffc934" #yellow
+      navbar-bg: "#00a454" #green
 runtime: shiny
 ---
 
@@ -24,8 +26,8 @@ library(patchwork)
 source(here("utils/utils.R"))
 source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
-source(here("utils/tech_impact_colors.R"))
 source(here("utils/plotly_utils.R"))
+source(here("utils/wrk_pal.R"))
 
 
 ## Load HUD Data 
@@ -133,7 +135,7 @@ valueBox(total_units_change_box_text, icon = "fa-building")
 # Create a plot for 
 riverside_rental_units_plot <- riverside_total_units %>%
   ggplot(aes(x = year, y = total_units)) +
-  geom_col(fill = tech_impact_colors("ti_blue")) +
+  geom_col(fill = get_wrk_color("green")) +
   labs(title = "Rental units available in Riverside",
        y = NULL, x = NULL) +
   theme_minimal()
@@ -141,8 +143,8 @@ riverside_rental_units_plot <- riverside_total_units %>%
 riverside_rental_changes_plot <- riverside_total_units %>%
   drop_na(pct_change) %>%
   ggplot(aes(x = year, y = pct_change)) + 
-  geom_line(color = tech_impact_colors("ti_blue")) + 
-  geom_point(color = tech_impact_colors("ti_blue")) +
+  geom_line(color = get_wrk_color("green")) + 
+  geom_point(color = get_wrk_color("green")) +
   scale_y_continuous(labels = ~paste0(., "%"),
                      breaks = scales::breaks_pretty()) +
   labs(title = "Changes in available units",
@@ -191,16 +193,16 @@ pct_occupied_plot <- pct_occupied_joined %>%
             hoveron = "points",
             hovertext = ~hovertext,
             hoverinfo = "text",
-            colors = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev()) %>%
+            colors = wrk_pal()(2)) %>%
   # Add annotations for Riverside vs. Wilmington
   add_annotations(x = 2018, y = 97,
                   text = "Riverside",
-                  font = list(color = tech_impact_colors("ti_blue"),
+                  font = list(color = get_wrk_color("green"),
                               size = 14),
                   showarrow = FALSE) %>% 
   add_annotations(x = 2020, y = 91,
                   text = "Delaware",
-                  font = list(color = tech_impact_colors("ti_orange"),
+                  font = list(color = get_wrk_color("blue"),
                               size = 14),
                   showarrow = FALSE) %>% 
   # Add caption 
@@ -268,11 +270,11 @@ tenure_plot <- tenure_stacked %>%
              color = location)) + 
   geom_line() + 
   geom_point() +
-    scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev()) +
+    scale_color_manual(values = wrk_pal()(2)) +
     annotate("text", x = 2018, y = 110, label = "Riverside",
-           color = tech_impact_colors("ti_blue")) +
+           color = get_wrk_color("green")) +
   annotate("text", x = 2020, y = 105, label = "Delaware",
-           color = tech_impact_colors("ti_orange")) +
+           color = get_wrk_color("blue")) +
   theme_minimal() + 
   labs(x = NULL, y = NULL,
        title = "Months since moved in") +
@@ -366,15 +368,15 @@ kinder_plot <- all_kinder %>%
   geom_point() +
   scale_y_continuous(labels = scales::label_percent()) +
   annotate("text", x = 2020, y = 0.75, label = "WRK",
-           color = tech_impact_colors("ti_blue")) +
+           color = get_wrk_color("green")) +
   annotate("text", x = 2017, y = 0.625, label = "Delaware",
-           color = tech_impact_colors("ti_orange")) +
+           color = get_wrk_color("blue")) +
   labs(title = "Children ready for kindergarten",
        x = NULL, y = NULL,
        caption = "Source: KidsCount",
        color = NULL) +
   guides(color = "none") +
-  scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange")) %>% rev()) +
+  scale_color_manual(values = wrk_pal()(2)) +
   theme_minimal()
 
 # Render the plot
@@ -424,13 +426,16 @@ ELA_plot <- eastside_ELA %>%
   ggplot(aes(x = schoolyear, y = gap)) +
   geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
                size = 1,
-               color = tech_impact_colors("ti_orange")) + 
+               color = get_wrk_color(palette = "secondary",
+                                     colorname = "yellow")) + 
   geom_point(size = 3, 
-             color = tech_impact_colors("ti_orange")) +
+             color = get_wrk_color(palette = "secondary",
+                                     colorname = "yellow")) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
-             color = tech_impact_colors("ti_blue")) + 
-  annotate("text", x = 2016.5, y = 1.5, label = "Delaware Average", color = tech_impact_colors("ti_blue")) +
+             color = get_wrk_color("blue")) + 
+  annotate("text", x = 2016.5, y = 1.5, label = "Delaware Average", 
+           color = get_wrk_color("blue")) +
   scale_y_continuous(labels = ~paste0(., "%")) +
   scale_x_continuous(breaks = scales::breaks_pretty()) +
   labs(title = "Literacy achievement gap",
@@ -480,13 +485,16 @@ math_plot <- eastside_math %>%
   ggplot(aes(x = schoolyear, y = gap)) +
   geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
                size = 1,
-               color = tech_impact_colors("ti_orange")) + 
+               color = get_wrk_color(palette = "secondary", 
+                                     colorname = "yellow")) + 
   geom_point(size = 3, 
-             color = tech_impact_colors("ti_orange")) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = tech_impact_colors("ti_blue")) + 
+             color = get_wrk_color(palette = "secondary", 
+                                     colorname = "yellow")) +
+  geom_hline(yintercept = 0, linetype = "dashed",
+             color = get_wrk_color("blue")) + 
   annotate("text", x = 2016.5, y = 1.25,
            label = "Delaware Average", 
-           color = tech_impact_colors("ti_blue")) +
+           color = get_wrk_color("blue")) +
   scale_y_continuous(labels = ~paste0(., "%")) +
   scale_x_continuous(breaks = scales::breaks_pretty()) +
   labs(title = "Math achievement gap",
@@ -521,16 +529,16 @@ grad_gap_plot <- graduation_gaps %>%
   ggplot(aes(x = schoolyear, y = gap, color = I(plot_color))) +
   geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
               method = "lm", se = FALSE,
-              color = tech_impact_colors("ti_green"),
+              color = get_wrk_color("green"),
               linetype = "dotted") + 
   geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
                size = 1.2) + 
   geom_point(size = 5) +
   geom_hline(yintercept = 0,
              linetype = "dashed",
-             color = tech_impact_colors("ti_blue")) + 
+             color = get_wrk_color("blue")) + 
   annotate("text", x = 2015, y = 0.25,
-           label = "Delaware Average", color = tech_impact_colors("ti_blue")) +
+           label = "Delaware Average", color = get_wrk_color("blue")) +
   labs(y = NULL,
        x = NULL,
        title = "High school graduation gap") +
@@ -603,12 +611,12 @@ unemployment_plot <- unemployment_summary_wide %>%
                    xend = year,
                    y = 0, yend = gap_to_Wilmington),
                size = 1.2,
-               color = tech_impact_colors("ti_orange")) + 
-  geom_point(size = 5, color = tech_impact_colors("ti_orange")) +
+               color = get_wrk_color("yellow", "secondary")) + 
+  geom_point(size = 5, color = get_wrk_color("yellow", "secondary")) +
   geom_hline(yintercept = 0, linetype = "dashed",
-             color = tech_impact_colors("ti_blue")) +
+             color = get_wrk_color("blue")) +
   annotate("text", label = "Wilmington average", x = 2011.5, y = -0.005,
-           color = tech_impact_colors("ti_blue")) + 
+           color = get_wrk_color("blue")) + 
   labs(y = NULL, x = NULL,
        title = "Gaps in unemployment rate vs. Wilmington",
        color = NULL) +
@@ -634,7 +642,7 @@ unemployment_rates_plot <- unemployment_summary_long %>%
   labs(color = NULL, x = NULL, y = NULL,
        title = "Unemployment rate",
        caption = "Data source: 5-year ACS") + 
-      scale_color_manual(values = unname(tech_impact_colors("ti_blue", "ti_orange", "ti_green")) %>% rev())
+      scale_color_manual(values = wrk_pal()(3))
 
 # Convert to Plotly
 unemployment_rates_plot %>%

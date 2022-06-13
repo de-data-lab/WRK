@@ -5,7 +5,7 @@ library(here)
 library(tidyverse)
 library(RColorBrewer)
 source(here("utils/get_de_open_data.R"))
-source(here("utils/tech_impact_colors.R"))
+source(here("utils/wrk_pal.R"))
 
 # Function to query the Open Data Delaware API
 
@@ -55,7 +55,9 @@ graduation_joined <- graduation_joined %>%
 
 # Add a variable to compare with the state with the 3 regions
 graduation_joined <- graduation_joined %>%
-  mutate(compare_w_state = recode(district, "State of Delaware" = "State of Delaware", .default = "Brandywine, Christina, or Colonial"))
+  mutate(compare_w_state = recode(district, 
+                                  "State of Delaware" = "State of Delaware", 
+                                  .default = "Brandywine, Christina, or Colonial"))
 
 # Save the dataset
 write_rds(graduation_joined, here("data/processed/workforce_graduation.rds"))
@@ -77,8 +79,9 @@ graduation_gaps_wide <- graduation_gaps_wide %>%
 # Add a color palette
 color_palette <- brewer.pal(n = 3, name = "Pastel1")
 graduation_gaps_wide <- graduation_gaps_wide %>%
-  mutate(plot_color = case_when(gap >= 0 ~ tech_impact_colors("ti_green"),
-                                gap < 0 ~ tech_impact_colors("ti_orange")))
+  mutate(plot_color = case_when(gap >= 0 ~ get_wrk_color("green"),
+                                gap < 0 ~ get_wrk_color(palette = "secondary",
+                                                        colorname = "yellow")))
 
 # Save the dataset
 write_rds(graduation_gaps_wide, here("data/processed/workforce_graduation_gaps.rds"))

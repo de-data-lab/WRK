@@ -63,7 +63,6 @@ hud_var_def <- hud_vars_df %>%
   select(variable, definition) %>%
   deframe()
 
-
 # Set ggplot global theme
 theme_set(theme_minimal())
 ```
@@ -603,7 +602,7 @@ valueBox(unemployment_text, icon = "fa-briefcase",
 ```
 
 
-### {-}
+### &nbsp; {-}
 ```{r}
 # Create the plot for unemployment gap against Wilmington
 unemployment_plot <- unemployment_summary_wide %>%   
@@ -631,7 +630,7 @@ renderPlot({unemployment_plot}, res = 90)
 ```
 
 
-### {-}
+### &nbsp; {-}
 
 ```{r}
 unemployment_rates_plot <- unemployment_summary_long %>%   
@@ -664,7 +663,6 @@ Inputs {.sidebar}
 -----------------------------------------------------------------------
 ### Outcome
 ```{r}
-
 selectInput("selectedOutcome", label = NULL, 
             choices = hud_vars)
 renderText({

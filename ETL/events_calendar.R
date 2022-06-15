@@ -65,6 +65,24 @@ all_calendars_df <- all_calendars_df %>%
          -MemberId, -MemberName, -Description, -IsPrivate, 
          -AllowPreCart, -InPreCart, -PreCartName)
 
+# Remove the location information from event names
+locations <- all_calendars_df %>% 
+  pull(FacilityName) %>% 
+  unique()
+# Add -None Specified- to locations
+locations <- locations %>% 
+  c("-None Specified-")
+# Create a pattern to match
+locations_pattern <- locations %>%
+  paste0(" \\(", ., "\\)") %>%
+  paste(collapse = "|")
+# Remove a matching string
+all_calendars_df <- all_calendars_df %>% 
+  mutate(EventName = str_remove(EventName, locations_pattern))
+# Create a bin for top events
+all_calendars_df <- all_calendars_df %>% 
+  mutate(top_events = fct_lump_n(EventName, 5))
+  
 # Parse date-times from the start and end time character vectors
 all_calendars_df <- all_calendars_df %>%
   mutate(across(c(StartTimeISO8601, EndTimeISO8601),

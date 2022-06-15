@@ -657,6 +657,120 @@ by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year`
 - However, the gaps are worsening since 2017 by `r unemployment_text` per year.
 
 
+# Events {data-orientation=columns}
+```{r}
+# Load data for events tab
+events_warehouse <- read_rds(here("data/processed/events_warehouse_calendar.rds"))
+# Trim the data up to the current date
+events_warehouse <- events_warehouse %>%
+  filter(EndTimeISO8601 < Sys.Date())
+
+# Total number of hours spent for events
+events_total_hours <- events_warehouse %>% 
+  group_by(year) %>%
+  summarise(hours = sum(duration_hour, na.rm = TRUE))
+
+# Get the average number of hours community output
+events_yearly_hours <- events_total_hours %>% 
+  summarise(total = mean(hours)) %>% 
+  pull(total)
+
+# Get the average number of events per month
+events_monthly_count <- events_warehouse %>% 
+  count(year, month) %>% 
+  summarise(mean_n = mean(n)) %>%
+  pull(mean_n)
+```
+
+
+Column 1: Number of events
+-----------------------------------------------------------------------
+
+### average events hosted {data-height=100}
+
+```{r}
+events_monthly_count %>% 
+  round(1) %>%
+  paste0(" events/month") %>%
+  valueBox(icon = "fa-calendar-plus")
+```
+
+### Number of events
+
+```{r}
+# Plot Over time
+event_counts_plot <- events_warehouse %>%
+  ggplot(aes(x = month, fill = location)) +
+  geom_histogram(binwidth = 0.5) + 
+  scale_x_continuous(labels = ~month.abb[.], breaks = 1:12) + 
+  facet_wrap(~year, ncol = 1) + 
+  labs(x = NULL, y = NULL,
+       title = "Number of Warehouse events over time",
+       fill = "Top locations",
+       caption = "Source: The Warehouse Public Calendar ")
+
+# Render the plot
+renderPlot({ event_counts_plot }, res = 100)
+```
+
+
+Column 2: Duration
+-----------------------------------------------------------------------
+
+### service provided to the community {data-height=100}
+
+```{r}
+events_yearly_hours %>% 
+  round(1) %>%
+  paste0(" hours/year") %>%
+  valueBox(icon = "fa-clock")
+```
+
+### Duration of events
+
+```{r}
+# Plot Over time
+events_weekly_duration <- events_warehouse %>%
+  mutate(week = floor_date(StartTimeISO8601, "weeks")) %>%
+  group_by(week) %>%
+  summarise(weekly_sum = sum(duration_hour, na.rm = TRUE)) %>%
+  mutate(year = year(week))
+
+# Sum of serviced weekly hours over time
+weekly_duration_plot <- events_weekly_duration %>%
+  ggplot(aes(x = week, 
+             y = weekly_sum, 
+             group = 1)) +
+  geom_line() + 
+  scale_y_continuous(labels = ~paste0(., " hrs")) +
+  labs(y = NULL,
+       x = NULL,
+       title = "Sum of weekly event hours over time")
+
+# Render the plot
+renderPlot({ weekly_duration_plot }, res = 90)
+```
+
+
+### Top events
+```{r}
+events_names_plot <- events_warehouse %>%
+  group_by(year, top_events) %>%
+  summarise(sum_hour = sum(duration_hour, na.rm = TRUE)) %>%
+  ggplot(aes(x = year, y = sum_hour, fill = top_events)) + 
+  geom_col() +
+  scale_y_continuous(labels = ~paste0(., " hrs")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = "Top events",
+       title = "Events with most hours")
+
+# Render plot
+renderPlot({ events_names_plot }, res = 100)
+```
+
+
+
 # Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
 
 Inputs {.sidebar}

@@ -84,6 +84,10 @@ all_calendars_df <- all_calendars_df %>%
                                    duration_hour >= duration_max_hour ~ NA_real_,
                                    TRUE ~ duration_hour))
 
+# Get year and month into separate columns for easier data handling
+all_calendars_df <- all_calendars_df %>%
+  mutate(year = year(StartTimeISO8601),
+         month = month(StartTimeISO8601))
 # Save the processed dataset
 write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.rds"))
 

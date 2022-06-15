@@ -88,6 +88,19 @@ all_calendars_df <- all_calendars_df %>%
 all_calendars_df <- all_calendars_df %>%
   mutate(year = year(StartTimeISO8601),
          month = month(StartTimeISO8601))
+
+# Code locations "-None Specified-" as a missing vaue
+all_calendars_df <- all_calendars_df %>% 
+  mutate(FacilityName = na_if(FacilityName, "-None Specified-"))
+
+# Code locations that are appearing less than threshold as "Other"
+num_locations <- 5
+# Create a new column "location" and store coded values 
+all_calendars_df <- all_calendars_df %>% 
+  mutate(location = fct_lump_n(FacilityName, num_locations))
+
+# TODO: Label the event types 
+
 # Save the processed dataset
 write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.rds"))
 

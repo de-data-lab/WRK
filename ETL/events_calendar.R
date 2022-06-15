@@ -85,7 +85,7 @@ all_calendars_df <- all_calendars_df %>%
                                    TRUE ~ duration_hour))
 
 # Save the processed dataset
-write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.csv"))
+write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.rds"))
 
 
 # Get the unique event names for manual labeling and classification

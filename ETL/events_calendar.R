@@ -88,9 +88,10 @@ all_calendars_df <- all_calendars_df %>%
 write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.rds"))
 
 
+# Export names for manual coding ------------------------------------------------
 # Get the unique event names for manual labeling and classification
 event_names <- all_calendars_df %>%
-  transmute(event_name = EventName) %>%
+  transmute(event_name = EventName, event_type = EventType) %>%
   distinct() %>%
   arrange(event_name)
 

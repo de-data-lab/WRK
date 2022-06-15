@@ -8,6 +8,7 @@ library(tidyverse)
 library(here)
 library(httr)
 library(jsonlite)
+library(lubridate)
 
 # Function to download the calendar data from a specified period
 download_calendar <- function(year = 2020){
@@ -63,6 +64,29 @@ all_calendars_df <- all_calendars_df %>%
   select(-OrganizationId, -EventUrl, -FacilityUrl,
          -MemberId, -MemberName, -Description, -IsPrivate, 
          -AllowPreCart, -InPreCart, -PreCartName)
+
+# Parse date-times from the start and end time character vectors
+all_calendars_df <- all_calendars_df %>%
+  mutate(across(c(StartTimeISO8601, EndTimeISO8601),
+                .fns = ~ymd_hms(.))) %>%
+  # Calculate duration of each event
+  mutate(duration = EndTimeISO8601 - StartTimeISO8601)
+
+# Calculate the intervals for each event, and calculate the duration in hours
+all_calendars_df <- all_calendars_df %>%
+  mutate(interval = StartTimeISO8601 %--% EndTimeISO8601) %>%
+  mutate(duration_hour = interval / hours())
+
+# Replace the negative/zero duration and long hours to missing
+duration_max_hour <- 8
+all_calendars_df <- all_calendars_df %>%
+  mutate(duration_hour = case_when(duration_hour <= 0 ~ NA_real_,
+                                   duration_hour >= duration_max_hour ~ NA_real_,
+                                   TRUE ~ duration_hour))
+
+# Save the processed dataset
+write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.csv"))
+
 
 # Get the unique event names for manual labeling and classification
 event_names <- all_calendars_df %>%

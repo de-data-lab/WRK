@@ -508,8 +508,6 @@ renderPlot({math_plot}, res = 80)
 
 ### Notes {data-height=150}
 
- 
-
 Column 4: Graduation Rate
 -----------------------------------------------------------------------
 
@@ -561,9 +559,6 @@ state average worsened by `r gap_yearly_change` per year from `r start_year` to 
 
 - However, if we focus on 2016 onwards, the gap may be improving. On average, the gap
 improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
-
-
-
 
 
 # Workforce Development {data-orientation=columns}
@@ -770,7 +765,6 @@ renderPlot({ events_names_plot }, res = 100)
 ```
 
 
-
 # Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
 
 Inputs {.sidebar}
@@ -783,7 +777,6 @@ renderText({
     hud_var_def[[input$selectedOutcome]]
   })
 ```
-
 
 
 ```{r}

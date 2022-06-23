@@ -41,8 +41,12 @@ target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
 theme_set(theme_minimal())
 ```
 
+# Home {data-orientation=rows}
+```{r, ref.label=c("housing-setup", "education-setup", "literacy-setup", "math-setup", "graduation-setup", "workforce-setup", "events-setup")}
+# Run the code chunks ahead to render the home component
+```
 # Housing {data-orientation=columns}
-```{r}
+```{r, housing-setup}
 # New available units for rent
 # Calculate the Riverside metrics
 riverside_total_units <- hud_de %>%
@@ -261,7 +265,7 @@ renderPlot({tenure_plot}, res = 100)
 
 
 # Education {data-orientation=columns}
-```{r}
+```{r, education-setup}
 kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
 DE_kinder <- kinder_readiness_DE_wide %>%
   transmute(year = TimeFrame,location = Location,
@@ -295,7 +299,7 @@ kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison
 ```
 
 
-```{r}
+```{r, graduation-setup}
 # Load Graduation Data
 graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
 graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
@@ -431,7 +435,7 @@ Column 3: Math
 
 ### Improvement in math achievement gap to Delaware 
 
-```{r}
+```{r, math-setup}
 # Load Data
 math <- read_rds(here("data/processed/education_achievement_wide_math.rds"))
 # Get the eastside & calculate the gap
@@ -627,7 +631,7 @@ by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year`
 
 
 # Events {data-orientation=columns}
-```{r}
+```{r, events-setup}
 # Load data for events tab
 events_warehouse <- read_rds(here("data/processed/events_warehouse_calendar.rds"))
 # Trim the data up to the current date

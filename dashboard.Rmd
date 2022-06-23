@@ -319,9 +319,7 @@ On average, `r kinder_txt["WRK"]` of children in WRK group were kindergarten rea
 Column 2: Literacy
 -----------------------------------------------------------------------
 
-### Improvement in literacy achievement gap to Delaware {data-height=100}
-
-```{r}
+```{r, literacy-setup}
 # Load Data
 ELA <- read_rds(here("data/processed/education_achievement_wide_ELA.rds"))
 
@@ -338,10 +336,8 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 
 ```
 
-```{r}
-# Render value box
-valueBox(eastside_ELA_gap_coeff %>% sprintf("%+.1f%%/year", .), icon = "fa-book-open")
-
+```{r child='components/education_literacy_valbox.Rmd'}
+### Improvement in literacy achievement gap to Delaware {data-height=100}
 ```
 
 

@@ -86,9 +86,6 @@ pct_occupied_joined <- riverside_pct_occupied %>%
 # Calculate the average year-to-year change in pct_occupied
 pct_occupied_joined_lm <- riverside_pct_occupied %>%
   lm(data = ., pct_occupied ~ year)
-## If we are adjusting for the total_units:
-# pct_occupied_joined_lm <- riverside_pct_occupied %>%
-#   lm(data = ., pct_occupied ~ year + total_units)  
 
 # Get the coefficient 
 pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]

@@ -1,0 +1,107 @@
+```{r}
+# Set bootstrap styles
+outer_container_classes <- c(
+  ".bg-dark",
+  ".p-4",
+  ".flex-fill",
+  ".m-2"
+) %>% 
+  # Collapse as a string
+  paste(collapse = " ")
+```
+
+
+
+Row 1 {data-height=500}
+-----------------------------------------------------------------------
+
+
+:::: {`r outer_container_classes`}
+
+[Housing]{.h1 .fw-bolder}
+
+::::: {.d-flex .flex-column}
+
+```{r, child = "housing_units_count_change_valbox.Rmd"}
+```
+
+```{r child='housing_occupied_valbox.Rmd'}
+# Average change in proportion of occupied units
+```
+
+```{r child='housing_tenure_valbox.Rmd'}
+# Average months since moved in
+```
+
+:::::
+
+::::
+
+
+:::: {`r outer_container_classes`}
+
+[Education]{.h1}
+
+```{r child='education_kinder_valbox.Rmd'}
+# More kindergarten-ready than Delaware average
+```
+
+::::: {.d-flex}
+
+```{r child='education_literacy_valbox.Rmd'}
+### Improvement in literacy achievement gap to Delaware {data-height=100}
+```
+
+```{r child='education_math_valbox.Rmd'}
+# Improvement in math achievement gap to Delaware 
+```
+
+:::::
+
+```{r child='education_graduation_valbox.Rmd'}
+# Improvement in high school graduation gap to Delaware, since 2016 
+```
+
+
+::::
+
+
+Column 2 {data-height=500}
+-----------------------------------------------------------------------
+
+
+:::: {`r outer_container_classes`}
+
+[Workforce]{.h1 .fw-bolder}
+
+```{r child='workforce_unemployment_valbox.Rmd'}
+# Unemployment gaps to Wilmington, since 2017
+```
+
+::::
+
+:::: {`r outer_container_classes`}
+
+[Safety]{.h1 .fw-bolder}
+
+TBD
+
+::::
+
+
+:::: {`r outer_container_classes`}
+
+[Events]{.h1 .fw-bolder}
+
+```{r child='events_per_month_valbox.Rmd'}
+# average events hosted
+```
+
+
+```{r child='events_yearly_hours_valbox.Rmd'}
+# service provided to the community
+```
+
+
+::::
+

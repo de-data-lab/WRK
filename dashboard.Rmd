@@ -281,10 +281,8 @@ gap_yearly_change_2016_txt <- gap_yearly_change_2016 %>%
 Column 1: Kindergarten Readiness
 -----------------------------------------------------------------------
 
-### More kindergarten-ready than Delaware average {data-height=100}
-
-```{r}
-valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
+```{r child='components/education_kinder_valbox.Rmd'}
+# More kindergarten-ready than Delaware average
 ```
 
 ### Kindergarten Readiness {data-height=500}

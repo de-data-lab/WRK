@@ -1,0 +1,5 @@
+### More kindergarten-ready than Delaware average
+
+```{r}
+valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
+```

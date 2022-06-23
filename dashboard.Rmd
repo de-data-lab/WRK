@@ -45,6 +45,12 @@ theme_set(theme_minimal())
 ```{r, ref.label=c("housing-setup", "education-setup", "literacy-setup", "math-setup", "graduation-setup", "workforce-setup", "events-setup")}
 # Run the code chunks ahead to render the home component
 ```
+
+```{r child="components/home.Rmd"}
+# Render the Home tab
+```
+
+
 # Housing {data-orientation=columns}
 ```{r, housing-setup}
 # New available units for rent

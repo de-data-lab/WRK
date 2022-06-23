@@ -1,0 +1,12 @@
+### Unemployment gaps to Wilmington, since 2017
+
+```{r}
+unemployment_box_color <- case_when(unemployment_gaps_yearly_change_2017 >= 0 ~ "warning",
+                                    unemployment_gaps_yearly_change_2017 < 0 ~ "success")
+unemployment_text <- unemployment_gaps_yearly_change_2017 %>%
+  sprintf(fmt = "%+.1f%%", .)
+
+unemployment_text %>%  
+  valueBox(icon = "fa-briefcase",
+           color = unemployment_box_color)
+```

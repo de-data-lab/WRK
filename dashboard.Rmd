@@ -483,16 +483,14 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 # Workforce Development {data-orientation=columns}
 
-```{r}
+Column 1: Unemployment
+-----------------------------------------------------------------------
+```{r, workforce-setup}
 # Load Data
 unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
 unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
 unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
-```
 
-Column 1: Unemployment
------------------------------------------------------------------------
-```{r}
 # Unemployment 
 unemployment_gaps_lm <- lm(data = unemployment_summary_wide,
                            formula = gap_to_Wilmington ~ year)
@@ -506,14 +504,8 @@ unemployment_gaps_yearly_change_2017 <- unemployment_gaps_lm_2017$coefficients["
 ```
 
 
-### Unemployment gaps to Wilmington, since 2017 {data-height=100}
-```{r}
-unemployment_box_color <- case_when(unemployment_gaps_yearly_change_2017 >= 0 ~ "warning",
-                                    unemployment_gaps_yearly_change_2017 < 0 ~ "success")
-unemployment_text <- unemployment_gaps_yearly_change_2017 %>%
-  sprintf(fmt = "%+.1f%%", .)
-valueBox(unemployment_text, icon = "fa-briefcase",
-         color = unemployment_box_color)
+```{r child='components/workforce_unemployment_valbox.Rmd'}
+# Unemployment gaps to Wilmington, since 2017
 ```
 
 

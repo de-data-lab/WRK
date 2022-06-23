@@ -131,20 +131,8 @@ renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
 Column 2: Occupied units
 -----------------------------------------------------------------------
 
-### Average change in proportion of occupied units
-
-```{r}
-# Get the text to be rendered
-pct_occupied_box_text <- pct_occupied_riverside_change %>% 
-  round(1) %>%
-  paste0("%/year")
-# Change color of the infobox depending on direction
-pct_occupied_color <- case_when(pct_occupied_riverside_change >= 0 ~ "success",
-                                TRUE ~ "warning")
-# Render the valuebox
-valueBox(pct_occupied_box_text,
-         icon = "fas fa-house-user", 
-         color = pct_occupied_color)
+```{r child='components/housing_occupied_valbox.Rmd'}
+# Average change in proportion of occupied units
 ```
 
 ### Occupied Units

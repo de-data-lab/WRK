@@ -23,18 +23,13 @@ library(plotly)
 library(patchwork)
 library(lubridate)
 
-
 source(here("utils/utils.R"))
 source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
 source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
 
-
 ## Load HUD Data 
-# Data dictionary: https://www.huduser.gov/portal/datasets/pictures/dictionary_2021.pdf
-# Number_reported is the same as the 
-# hud_tracts_ak_mn_URL <- "https://www.huduser.gov/portal/datasets/pictures/files/TRACT_AK_MN_2019.xlsx"
 hud_de <- read_rds(here("data/processed/hud_DE_combined.rds"))
 # Estimate the number of occupied units
 hud_de <- hud_de %>%
@@ -77,6 +72,7 @@ riverside_total_units <- hud_de %>%
   mutate(total_units_lag = lag(total_units)) %>%
   # Calculate the percent change
   mutate(pct_change = ((total_units/lag(total_units) - 1)) * 100)
+
 # Mean percent change across years
 riverside_total_units_pct_change_mean <- riverside_total_units %>%
   summarise(mean = mean(pct_change, na.rm = TRUE))
@@ -85,7 +81,6 @@ riverside_total_units_pct_change_mean <- riverside_total_units %>%
 riverside_total_units_lm <- riverside_total_units %>%
   lm(data = ., total_units ~ year)
 riverside_total_units_coef <- coef(riverside_total_units_lm)[["year"]]
-
   
 ## Proportions of units occupied 
 # Calculate the Riverside metrics

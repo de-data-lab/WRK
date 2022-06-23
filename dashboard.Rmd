@@ -94,14 +94,9 @@ pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]
 
 Column 1: Available Rental Units
 -----------------------------------------------------------------------
-### Change in available units for rent
 
-```{r}
-total_units_change_box_text <- riverside_total_units_coef %>%
-  round(1) %>%
-  paste0("/year")
-
-valueBox(total_units_change_box_text, icon = "fa-building")
+```{r child="components/housing_units_count_change_valbox.Rmd"}
+# Change in available units for rent
 ```
 
 

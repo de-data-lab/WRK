@@ -8,6 +8,7 @@ library(tidyverse)
 library(here)
 library(httr)
 library(jsonlite)
+library(lubridate)
 
 # Function to download the calendar data from a specified period
 download_calendar <- function(year = 2020){
@@ -64,9 +65,68 @@ all_calendars_df <- all_calendars_df %>%
          -MemberId, -MemberName, -Description, -IsPrivate, 
          -AllowPreCart, -InPreCart, -PreCartName)
 
+# Remove the location information from event names
+locations <- all_calendars_df %>% 
+  pull(FacilityName) %>% 
+  unique()
+# Add -None Specified- to locations
+locations <- locations %>% 
+  c("-None Specified-")
+# Create a pattern to match
+locations_pattern <- locations %>%
+  paste0(" \\(", ., "\\)") %>%
+  paste(collapse = "|")
+# Remove a matching string
+all_calendars_df <- all_calendars_df %>% 
+  mutate(EventName = str_remove(EventName, locations_pattern))
+# Create a bin for top events
+all_calendars_df <- all_calendars_df %>% 
+  mutate(top_events = fct_lump_n(EventName, 5))
+  
+# Parse date-times from the start and end time character vectors
+all_calendars_df <- all_calendars_df %>%
+  mutate(across(c(StartTimeISO8601, EndTimeISO8601),
+                .fns = ~ymd_hms(.))) %>%
+  # Calculate duration of each event
+  mutate(duration = EndTimeISO8601 - StartTimeISO8601)
+
+# Calculate the intervals for each event, and calculate the duration in hours
+all_calendars_df <- all_calendars_df %>%
+  mutate(interval = StartTimeISO8601 %--% EndTimeISO8601) %>%
+  mutate(duration_hour = interval / hours())
+
+# Replace the negative/zero duration and long hours to missing
+duration_max_hour <- 8
+all_calendars_df <- all_calendars_df %>%
+  mutate(duration_hour = case_when(duration_hour <= 0 ~ NA_real_,
+                                   duration_hour >= duration_max_hour ~ NA_real_,
+                                   TRUE ~ duration_hour))
+
+# Get year and month into separate columns for easier data handling
+all_calendars_df <- all_calendars_df %>%
+  mutate(year = year(StartTimeISO8601),
+         month = month(StartTimeISO8601))
+
+# Code locations "-None Specified-" as a missing vaue
+all_calendars_df <- all_calendars_df %>% 
+  mutate(FacilityName = na_if(FacilityName, "-None Specified-"))
+
+# Code locations that are appearing less than threshold as "Other"
+num_locations <- 5
+# Create a new column "location" and store coded values 
+all_calendars_df <- all_calendars_df %>% 
+  mutate(location = fct_lump_n(FacilityName, num_locations))
+
+# TODO: Label the event types 
+
+# Save the processed dataset
+write_rds(all_calendars_df, here("data/processed/events_warehouse_calendar.rds"))
+
+
+# Export names for manual coding ------------------------------------------------
 # Get the unique event names for manual labeling and classification
 event_names <- all_calendars_df %>%
-  transmute(event_name = EventName) %>%
+  transmute(event_name = EventName, event_type = EventType) %>%
   distinct() %>%
   arrange(event_name)
 

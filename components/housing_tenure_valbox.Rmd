@@ -1,0 +1,32 @@
+### Average months since moved in
+
+```{r}
+# Average months since moved in
+riverside_tenure <- hud_de %>%
+    filter(code == "10003003002") %>%
+  select(year, months_from_movein, pct_occupied, total_units) %>%
+  mutate(location = "riverside")
+
+DE_tenure <- hud_de %>%
+  group_by(year) %>%
+  summarise(months_from_movein = mean(months_from_movein, na.rm = TRUE),
+            pct_occupied = mean(pct_occupied, na.rm = TRUE),
+            total_units = mean(total_units, na.rm = TRUE)) %>%
+  mutate(location = "DE")
+
+# Combine the Riverside and DE data
+tenure_stacked <- riverside_tenure %>%
+  bind_rows(DE_tenure)
+
+# Calculate the average change in tenure for Riverside
+riverside_tenure_lm <- riverside_tenure %>%
+  lm(data = ., months_from_movein ~ year)
+
+riverside_tenure_coef <- coef(riverside_tenure_lm)[["year"]]
+
+riverside_tenure_text <- riverside_tenure_coef %>%
+  round(1) %>%
+  sprintf("%+.1fmo/year", .)
+
+valueBox(riverside_tenure_text, icon = "fas fa-calendar-alt")
+```

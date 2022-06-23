@@ -1,0 +1,8 @@
+### service provided to the community
+
+```{r}
+events_yearly_hours %>% 
+  round(1) %>%
+  paste0(" hours/year") %>%
+  valueBox(icon = "fa-clock")
+```

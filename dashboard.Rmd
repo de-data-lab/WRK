@@ -619,13 +619,8 @@ renderPlot({ event_counts_plot }, res = 100)
 Column 2: Duration
 -----------------------------------------------------------------------
 
-### service provided to the community {data-height=100}
-
-```{r}
-events_yearly_hours %>% 
-  round(1) %>%
-  paste0(" hours/year") %>%
-  valueBox(icon = "fa-clock")
+```{r child='components/events_yearly_hours_valbox.Rmd'}
+# service provided to the community
 ```
 
 ### Duration of events

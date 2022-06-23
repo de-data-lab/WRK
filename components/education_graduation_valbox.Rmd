@@ -1,0 +1,7 @@
+### Improvement in high school graduation gap to Delaware, since 2016
+
+```{r}
+gap_yearly_change_2016 %>%
+  sprintf("%+.1f%%/year", .) %>%
+  valueBox(icon = "fa-graduation-cap")
+```

@@ -432,10 +432,9 @@ renderPlot({math_plot}, res = 80)
 Column 4: Graduation Rate
 -----------------------------------------------------------------------
 
-### Improvement in high school graduation gap to Delaware, since 2016 {data-height=100}
 
-```{r}
-valueBox(gap_yearly_change_2016 %>% sprintf("%+.1f%%/year", .), icon = "fa-graduation-cap")
+```{r child='components/education_graduation_valbox.Rmd'}
+# Improvement in high school graduation gap to Delaware, since 2016 
 ```
 
 

@@ -593,13 +593,8 @@ events_monthly_count <- events_warehouse %>%
 Column 1: Number of events
 -----------------------------------------------------------------------
 
-### average events hosted {data-height=100}
-
-```{r}
-events_monthly_count %>% 
-  round(1) %>%
-  paste0(" events/month") %>%
-  valueBox(icon = "fa-calendar-plus")
+```{r child='components/events_per_month_valbox.Rmd'}
+# average events hosted
 ```
 
 ### Number of events

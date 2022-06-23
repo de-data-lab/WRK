@@ -1,0 +1,8 @@
+### average events hosted
+
+```{r}
+events_monthly_count %>% 
+  round(1) %>%
+  paste0(" events/month") %>%
+  valueBox(icon = "fa-calendar-plus")
+```

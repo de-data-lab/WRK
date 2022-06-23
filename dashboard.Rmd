@@ -23,52 +23,36 @@ library(plotly)
 library(patchwork)
 library(lubridate)
 
-
 source(here("utils/utils.R"))
 source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
 source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
 
-
 ## Load HUD Data 
-# Data dictionary: https://www.huduser.gov/portal/datasets/pictures/dictionary_2021.pdf
-# Number_reported is the same as the 
-# hud_tracts_ak_mn_URL <- "https://www.huduser.gov/portal/datasets/pictures/files/TRACT_AK_MN_2019.xlsx"
 hud_de <- read_rds(here("data/processed/hud_DE_combined.rds"))
-# Estimate the number of occupied units
-hud_de <- hud_de %>%
-  mutate(occupied_units = case_when(pct_occupied == -4 ~ NA_real_,
-                   TRUE ~ round(total_units * (pct_occupied/100), 0)))
 
 # Target Census Tracts
 target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
                    "CT 6.01" = "10003000601",
                    "CT 6.02" = "10003000602")
 
-# Recode the missing values 
-hud_de <- hud_de %>%
-  mutate(across(where(is.numeric),
-                ~na_if(., y = -1))) %>%
-    mutate(across(where(is.numeric),
-                ~na_if(., y = -4)))
-
-# Load variable names
-hud_vars_df <- read_excel(here("data/raw/hud_vars.xlsx"))
-hud_vars <- hud_vars_df$variable
-names(hud_vars) <- hud_vars_df$label
-
-# Create a list of variable descriptions
-hud_var_def <- hud_vars_df %>%
-  select(variable, definition) %>%
-  deframe()
-
 # Set ggplot global theme
 theme_set(theme_minimal())
 ```
 
+# Home {data-orientation=rows}
+```{r, ref.label=c("housing-setup", "education-setup", "literacy-setup", "math-setup", "graduation-setup", "workforce-setup", "events-setup")}
+# Run the code chunks ahead to render the home component
+```
+
+```{r child="components/home.Rmd"}
+# Render the Home tab
+```
+
+
 # Housing {data-orientation=columns}
-```{r}
+```{r, housing-setup}
 # New available units for rent
 # Calculate the Riverside metrics
 riverside_total_units <- hud_de %>%
@@ -77,6 +61,7 @@ riverside_total_units <- hud_de %>%
   mutate(total_units_lag = lag(total_units)) %>%
   # Calculate the percent change
   mutate(pct_change = ((total_units/lag(total_units) - 1)) * 100)
+
 # Mean percent change across years
 riverside_total_units_pct_change_mean <- riverside_total_units %>%
   summarise(mean = mean(pct_change, na.rm = TRUE))
@@ -85,7 +70,6 @@ riverside_total_units_pct_change_mean <- riverside_total_units %>%
 riverside_total_units_lm <- riverside_total_units %>%
   lm(data = ., total_units ~ year)
 riverside_total_units_coef <- coef(riverside_total_units_lm)[["year"]]
-
   
 ## Proportions of units occupied 
 # Calculate the Riverside metrics
@@ -108,9 +92,6 @@ pct_occupied_joined <- riverside_pct_occupied %>%
 # Calculate the average year-to-year change in pct_occupied
 pct_occupied_joined_lm <- riverside_pct_occupied %>%
   lm(data = ., pct_occupied ~ year)
-## If we are adjusting for the total_units:
-# pct_occupied_joined_lm <- riverside_pct_occupied %>%
-#   lm(data = ., pct_occupied ~ year + total_units)  
 
 # Get the coefficient 
 pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]
@@ -119,20 +100,15 @@ pct_occupied_riverside_change <- coef(pct_occupied_joined_lm)[["year"]]
 
 Column 1: Available Rental Units
 -----------------------------------------------------------------------
-### Change in available units for rent
 
-```{r}
-total_units_change_box_text <- riverside_total_units_coef %>%
-  round(1) %>%
-  paste0("/year")
-
-valueBox(total_units_change_box_text, icon = "fa-building")
+```{r child="components/housing_units_count_change_valbox.Rmd"}
+# Change in available units for rent
 ```
 
 
 ### Available rental units
-```{r}
-# Create a plot for 
+```{r, housing-total-units-plot}
+# Create a plot for available rental units
 riverside_rental_units_plot <- riverside_total_units %>%
   ggplot(aes(x = year, y = total_units)) +
   geom_col(fill = get_wrk_color("green")) +
@@ -153,7 +129,8 @@ riverside_rental_changes_plot <- riverside_total_units %>%
 ```
 
 ```{r}
-renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
+# Render plots and layout with {patchwork}
+renderPlot({ riverside_rental_units_plot / riverside_rental_changes_plot },
            res = 80)
 ```
 
@@ -161,20 +138,8 @@ renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
 Column 2: Occupied units
 -----------------------------------------------------------------------
 
-### Average change in proportion of occupied units
-
-```{r}
-# Get the text to be rendered
-pct_occupied_box_text <- pct_occupied_riverside_change %>% 
-  round(1) %>%
-  paste0("%/year")
-# Change color of the infobox depending on direction
-pct_occupied_color <- case_when(pct_occupied_riverside_change >= 0 ~ "success",
-                                TRUE ~ "warning")
-# Render the valuebox
-valueBox(pct_occupied_box_text,
-         icon = "fas fa-house-user", 
-         color = pct_occupied_color)
+```{r child='components/housing_occupied_valbox.Rmd'}
+# Average change in proportion of occupied units
 ```
 
 ### Occupied Units
@@ -229,38 +194,10 @@ renderPlotly({pct_occupied_plot })
 Column 3: Months since move-in
 -----------------------------------------------------------------------
 
-### Average months since moved in
-
-```{r}
+```{r child='components/housing_tenure_valbox.Rmd'}
 # Average months since moved in
-riverside_tenure <- hud_de %>%
-    filter(code == "10003003002") %>%
-  select(year, months_from_movein, pct_occupied, total_units) %>%
-  mutate(location = "riverside")
-
-DE_tenure <- hud_de %>%
-  group_by(year) %>%
-  summarise(months_from_movein = mean(months_from_movein, na.rm = TRUE),
-            pct_occupied = mean(pct_occupied, na.rm = TRUE),
-            total_units = mean(total_units, na.rm = TRUE)) %>%
-  mutate(location = "DE")
-
-# Combine the Riverside and DE data
-tenure_stacked <- riverside_tenure %>%
-  bind_rows(DE_tenure)
-
-# Calculate the average change in tenure for Riverside
-riverside_tenure_lm <- riverside_tenure %>%
-  lm(data = ., months_from_movein ~ year)
-
-riverside_tenure_coef <- coef(riverside_tenure_lm)[["year"]]
-
-riverside_tenure_text <- riverside_tenure_coef %>%
-  round(1) %>%
-  sprintf("%+.1fmo/year", .)
-
-valueBox(riverside_tenure_text, icon = "fas fa-calendar-alt")
 ```
+
 
 ### Average months since moved in
 
@@ -280,14 +217,14 @@ tenure_plot <- tenure_stacked %>%
        title = "Months since moved in") +
   guides(color = "none")
 
-renderPlot({tenure_plot}, res = 100)
+renderPlot({ tenure_plot }, res = 100)
 
 ```
 
 
 
 # Education {data-orientation=columns}
-```{r}
+```{r, education-setup}
 kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
 DE_kinder <- kinder_readiness_DE_wide %>%
   transmute(year = TimeFrame,location = Location,
@@ -321,7 +258,7 @@ kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison
 ```
 
 
-```{r}
+```{r, graduation-setup}
 # Load Graduation Data
 graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
 graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
@@ -352,11 +289,10 @@ gap_yearly_change_2016_txt <- gap_yearly_change_2016 %>%
 Column 1: Kindergarten Readiness
 -----------------------------------------------------------------------
 
-### More kindergarten-ready than Delaware average {data-height=100}
-
-```{r}
-valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
+```{r child='components/education_kinder_valbox.Rmd'}
+# More kindergarten-ready than Delaware average
 ```
+
 
 ### Kindergarten Readiness {data-height=500}
 
@@ -392,9 +328,7 @@ On average, `r kinder_txt["WRK"]` of children in WRK group were kindergarten rea
 Column 2: Literacy
 -----------------------------------------------------------------------
 
-### Improvement in literacy achievement gap to Delaware {data-height=100}
-
-```{r}
+```{r, literacy-setup}
 # Load Data
 ELA <- read_rds(here("data/processed/education_achievement_wide_ELA.rds"))
 
@@ -411,10 +345,8 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 
 ```
 
-```{r}
-# Render value box
-valueBox(eastside_ELA_gap_coeff %>% sprintf("%+.1f%%/year", .), icon = "fa-book-open")
-
+```{r child='components/education_literacy_valbox.Rmd'}
+### Improvement in literacy achievement gap to Delaware {data-height=100}
 ```
 
 
@@ -445,19 +377,17 @@ ELA_plot <- eastside_ELA %>%
   theme_minimal()
 
 # Render plot
-renderPlot({ELA_plot}, res = 80)
+renderPlot({ ELA_plot }, res = 80)
 ```
 
 ### Notes {data-height=150}
 
  
-
 Column 3: Math
 -----------------------------------------------------------------------
 
-### Improvement in math achievement gap to Delaware 
 
-```{r}
+```{r, math-setup}
 # Load Data
 math <- read_rds(here("data/processed/education_achievement_wide_math.rds"))
 # Get the eastside & calculate the gap
@@ -472,9 +402,8 @@ eastside_math_gap_coeff <- eastside_math_lm$coefficients[["schoolyear"]]
 
 ```
 
-```{r}
-valueBox(eastside_math_gap_coeff %>% sprintf("%+.1f%%/year", .), icon = "fas fa-calculator")
-
+```{r child='components/education_math_valbox.Rmd'}
+# Improvement in math achievement gap to Delaware 
 ```
 
 ### Math Achievement {data-height=500}
@@ -511,10 +440,9 @@ renderPlot({math_plot}, res = 80)
 Column 4: Graduation Rate
 -----------------------------------------------------------------------
 
-### Improvement in high school graduation gap to Delaware, since 2016 {data-height=100}
 
-```{r}
-valueBox(gap_yearly_change_2016 %>% sprintf("%+.1f%%/year", .), icon = "fa-graduation-cap")
+```{r child='components/education_graduation_valbox.Rmd'}
+# Improvement in high school graduation gap to Delaware, since 2016 
 ```
 
 
@@ -563,16 +491,14 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 # Workforce Development {data-orientation=columns}
 
-```{r}
+Column 1: Unemployment
+-----------------------------------------------------------------------
+```{r, workforce-setup}
 # Load Data
 unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
 unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
 unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
-```
 
-Column 1: Unemployment
------------------------------------------------------------------------
-```{r}
 # Unemployment 
 unemployment_gaps_lm <- lm(data = unemployment_summary_wide,
                            formula = gap_to_Wilmington ~ year)
@@ -586,14 +512,8 @@ unemployment_gaps_yearly_change_2017 <- unemployment_gaps_lm_2017$coefficients["
 ```
 
 
-### Unemployment gaps to Wilmington, since 2017 {data-height=100}
-```{r}
-unemployment_box_color <- case_when(unemployment_gaps_yearly_change_2017 >= 0 ~ "warning",
-                                    unemployment_gaps_yearly_change_2017 < 0 ~ "success")
-unemployment_text <- unemployment_gaps_yearly_change_2017 %>%
-  sprintf(fmt = "%+.1f%%", .)
-valueBox(unemployment_text, icon = "fa-briefcase",
-         color = unemployment_box_color)
+```{r child='components/workforce_unemployment_valbox.Rmd'}
+# Unemployment gaps to Wilmington, since 2017
 ```
 
 
@@ -653,7 +573,7 @@ by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year`
 
 
 # Events {data-orientation=columns}
-```{r}
+```{r, events-setup}
 # Load data for events tab
 events_warehouse <- read_rds(here("data/processed/events_warehouse_calendar.rds"))
 # Trim the data up to the current date
@@ -681,13 +601,8 @@ events_monthly_count <- events_warehouse %>%
 Column 1: Number of events
 -----------------------------------------------------------------------
 
-### average events hosted {data-height=100}
-
-```{r}
-events_monthly_count %>% 
-  round(1) %>%
-  paste0(" events/month") %>%
-  valueBox(icon = "fa-calendar-plus")
+```{r child='components/events_per_month_valbox.Rmd'}
+# average events hosted
 ```
 
 ### Number of events
@@ -712,14 +627,10 @@ renderPlot({ event_counts_plot }, res = 100)
 Column 2: Duration
 -----------------------------------------------------------------------
 
-### service provided to the community {data-height=100}
-
-```{r}
-events_yearly_hours %>% 
-  round(1) %>%
-  paste0(" hours/year") %>%
-  valueBox(icon = "fa-clock")
+```{r child='components/events_yearly_hours_valbox.Rmd'}
+# service provided to the community
 ```
+
 
 ### Duration of events
 
@@ -766,6 +677,21 @@ renderPlot({ events_names_plot }, res = 100)
 
 
 # Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
+```{r}
+# Set up a list of variable names for creating an UI 
+
+# Load variable names
+hud_vars_df <- read_excel(here("data/raw/hud_vars.xlsx"))
+hud_vars <- hud_vars_df$variable
+names(hud_vars) <- hud_vars_df$label
+
+# Create a list of variable descriptions
+hud_var_def <- hud_vars_df %>%
+  select(variable, definition) %>%
+  deframe()
+
+```
+
 
 Inputs {.sidebar}
 -----------------------------------------------------------------------

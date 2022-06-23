@@ -37,16 +37,6 @@ target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
                    "CT 6.01" = "10003000601",
                    "CT 6.02" = "10003000602")
 
-# Load variable names
-hud_vars_df <- read_excel(here("data/raw/hud_vars.xlsx"))
-hud_vars <- hud_vars_df$variable
-names(hud_vars) <- hud_vars_df$label
-
-# Create a list of variable descriptions
-hud_var_def <- hud_vars_df %>%
-  select(variable, definition) %>%
-  deframe()
-
 # Set ggplot global theme
 theme_set(theme_minimal())
 ```
@@ -750,6 +740,21 @@ renderPlot({ events_names_plot }, res = 100)
 
 
 # Housing {data-navmenu="Details" data-icon="fas fa-house-user"}
+```{r}
+# Set up a list of variable names for creating an UI 
+
+# Load variable names
+hud_vars_df <- read_excel(here("data/raw/hud_vars.xlsx"))
+hud_vars <- hud_vars_df$variable
+names(hud_vars) <- hud_vars_df$label
+
+# Create a list of variable descriptions
+hud_var_def <- hud_vars_df %>%
+  select(variable, definition) %>%
+  deframe()
+
+```
+
 
 Inputs {.sidebar}
 -----------------------------------------------------------------------

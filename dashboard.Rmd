@@ -107,8 +107,8 @@ Column 1: Available Rental Units
 
 
 ### Available rental units
-```{r}
-# Create a plot for 
+```{r, housing-total-units-plot}
+# Create a plot for available rental units
 riverside_rental_units_plot <- riverside_total_units %>%
   ggplot(aes(x = year, y = total_units)) +
   geom_col(fill = get_wrk_color("green")) +
@@ -129,7 +129,8 @@ riverside_rental_changes_plot <- riverside_total_units %>%
 ```
 
 ```{r}
-renderPlot({riverside_rental_units_plot / riverside_rental_changes_plot},
+# Render plots and layout with {patchwork}
+renderPlot({ riverside_rental_units_plot / riverside_rental_changes_plot },
            res = 80)
 ```
 
@@ -197,6 +198,7 @@ Column 3: Months since move-in
 # Average months since moved in
 ```
 
+
 ### Average months since moved in
 
 ```{r}
@@ -215,7 +217,7 @@ tenure_plot <- tenure_stacked %>%
        title = "Months since moved in") +
   guides(color = "none")
 
-renderPlot({tenure_plot}, res = 100)
+renderPlot({ tenure_plot }, res = 100)
 
 ```
 
@@ -290,6 +292,7 @@ Column 1: Kindergarten Readiness
 ```{r child='components/education_kinder_valbox.Rmd'}
 # More kindergarten-ready than Delaware average
 ```
+
 
 ### Kindergarten Readiness {data-height=500}
 
@@ -374,13 +377,12 @@ ELA_plot <- eastside_ELA %>%
   theme_minimal()
 
 # Render plot
-renderPlot({ELA_plot}, res = 80)
+renderPlot({ ELA_plot }, res = 80)
 ```
 
 ### Notes {data-height=150}
 
  
-
 Column 3: Math
 -----------------------------------------------------------------------
 
@@ -628,6 +630,7 @@ Column 2: Duration
 ```{r child='components/events_yearly_hours_valbox.Rmd'}
 # service provided to the community
 ```
+
 
 ### Duration of events
 

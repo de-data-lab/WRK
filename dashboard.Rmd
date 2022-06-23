@@ -31,22 +31,11 @@ source(here("utils/wrk_pal.R"))
 
 ## Load HUD Data 
 hud_de <- read_rds(here("data/processed/hud_DE_combined.rds"))
-# Estimate the number of occupied units
-hud_de <- hud_de %>%
-  mutate(occupied_units = case_when(pct_occupied == -4 ~ NA_real_,
-                   TRUE ~ round(total_units * (pct_occupied/100), 0)))
 
 # Target Census Tracts
 target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
                    "CT 6.01" = "10003000601",
                    "CT 6.02" = "10003000602")
-
-# Recode the missing values 
-hud_de <- hud_de %>%
-  mutate(across(where(is.numeric),
-                ~na_if(., y = -1))) %>%
-    mutate(across(where(is.numeric),
-                ~na_if(., y = -4)))
 
 # Load variable names
 hud_vars_df <- read_excel(here("data/raw/hud_vars.xlsx"))

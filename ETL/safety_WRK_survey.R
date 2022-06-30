@@ -25,9 +25,9 @@ metadata(survey_raw) <- c(name = "REACH Riverside Survey Data - 2020-2021",
 
 # Export the colnames for manual labeling
 survey_variables <- tibble(var = names(survey_raw))
-write_csv(survey_variables, here("data/safety_WRK_survey_variables.csv"))
+write_csv(survey_variables, here("data/processed/safety_WRK_survey_variables.csv"))
 # Load the manually-coded variables (partially re-coded)
-recode_dictionary <- read_csv(here("data/safety_WRK_survey_recode_dictionary.csv"))
+recode_dictionary <- read_csv(here("data/processed/safety_WRK_survey_recode_dictionary.csv"))
 
 # Select only the variables with recode labels
 variables_to_recode <- recode_dictionary %>% 

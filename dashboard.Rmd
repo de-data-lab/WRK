@@ -257,23 +257,58 @@ Column 3: Months since move-in
 ### Average months since moved in
 
 ```{r}
-tenure_plot <- tenure_stacked %>%
-  ggplot(aes(x = year, y = months_from_movein,
-             color = location)) + 
-  geom_line() + 
-  geom_point() +
-    scale_color_manual(values = wrk_pal()(2)) +
-    annotate("text", x = 2018, y = 110, label = "Riverside",
-           color = get_wrk_color("green")) +
-  annotate("text", x = 2020, y = 105, label = "Delaware",
-           color = get_wrk_color("blue")) +
-  theme_minimal() + 
-  labs(x = NULL, y = NULL,
-       title = "Months since moved in") +
-  guides(color = "none")
+# Prepare labels for the plot
+tenure_stacked <- tenure_stacked %>% 
+  mutate(location_label = recode(location,
+                                 "riverside" = "Riverside",
+                                 "DE" = "Delaware"))
 
-renderPlot({ tenure_plot }, res = 100)
-
+# Create a Plotly plot for the tenure (average months since move in)
+plot_ly(x = ~year,
+        y = ~months_from_movein,
+        text = ~location_label,
+        hovertemplate = "In %{x} in %{text}, an average family participating in public housing \n had stayed at the same place for %{y:.1f} months <extra></extra>")  %>%
+  # Add trace for Riverside
+  add_trace(
+    data = tenure_stacked %>% filter(location == "riverside"),
+    type = "scatter",
+    mode = "markers+lines",
+    color = I(WRK_primary_colors[["green"]])
+  )  %>% 
+  # Add trace for Delaware
+  add_trace(
+    data = tenure_stacked %>% filter(location == "DE"),
+    type = "scatter",
+    mode = "markers+lines",
+    color = I("gray")
+  )  %>% 
+  # Add annotation labels for the Riverside and Delaware
+  layout(annotations = list(
+    x = 2018, 
+    y = 110, 
+    text = "Riverside",
+    font = list(size = 16, color = get_wrk_color("green")),
+    showarrow = FALSE
+  )) %>%
+  layout(annotations = list(
+    x = 2020, 
+    y = 105, 
+    text = "Delaware",
+    font = list(size = 16, color = "gray"),
+    showarrow = FALSE
+  )) %>%
+  # Remove axes
+  plotly_remove_axis_titles() %>%
+  # Add suffix to the ticks (months)
+  layout(yaxis = list(ticksuffix = " mo.")) %>% 
+  hide_legend() %>%
+  # Add title
+  layout(title = list(text = "Average months since moved in",
+                      xanchor = "left", x = 0)) %>%
+  # Disable zoom
+  plotly_disable_zoom() %>%
+  # Hide the mode bar
+  plotly_hide_modebar()
 ```
 
 

@@ -123,30 +123,69 @@ Column 1: Available Rental Units
 
 ### Available rental units
 ```{r, housing-total-units-plot}
+# Get the maximum and minimum years for plotting
+min_year <- riverside_total_units %>%
+  pull(year) %>% min
+max_year <- riverside_total_units %>%
+  pull(year) %>% max
+
 # Create a plot for available rental units
-riverside_rental_units_plot <- riverside_total_units %>%
-  ggplot(aes(x = year, y = total_units)) +
-  geom_col(fill = get_wrk_color("green")) +
-  labs(title = "Rental units available in Riverside",
-       y = NULL, x = NULL) +
-  theme_minimal()
+plot_units_count <- riverside_total_units %>%
+  plot_ly(x = ~year,
+          y = ~total_units,
+          color = I(WRK_primary_colors[["green"]])) %>% 
+  # Add barplot and seth the hover text 
+  add_bars(hovertemplate = "In %{x}, Riverside had %{y} units <extra></extra>") %>%
+  # Remove axis title
+  plotly_remove_axis_titles()
 
-riverside_rental_changes_plot <- riverside_total_units %>%
+# Create a plot for percent changes in available units
+plot_units_change <- riverside_total_units %>%
   drop_na(pct_change) %>%
-  ggplot(aes(x = year, y = pct_change)) + 
-  geom_line(color = get_wrk_color("green")) + 
-  geom_point(color = get_wrk_color("green")) +
-  scale_y_continuous(labels = ~paste0(., "%"),
-                     breaks = scales::breaks_pretty()) +
-  labs(title = "Changes in available units",
-       y = NULL, x = NULL) +
-  theme_minimal()
-```
+  plot_ly(x = ~year,
+          y = ~pct_change,
+          color = I(WRK_primary_colors[["green"]])) %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers+lines",
+    hovertemplate = "In %{x}, the number of available units changed %{y:+.1}% from the previous year <extra></extra>"
+  ) %>%
+  # Remove axis titles
+  plotly_remove_axis_titles() %>%
+  # Get the min max for the year
+  summarise(min = min(year), max = max(year)) %>%
+  # Format the ticks
+  layout(xaxis = list(tickvals = ~seq(min, max))) %>%
+  # Gray out the axis line 
+  layout(yaxis = list(zerolinecolor = "#b8b8b8")) %>% 
+  # Format the y axis as percentages
+  layout(yaxis = list(ticksuffix = "%")) %>%
+  # Disable zoom
+  plotly_disable_zoom()
 
-```{r}
-# Render plots and layout with {patchwork}
-renderPlot({ riverside_rental_units_plot / riverside_rental_changes_plot },
-           res = 80)
+
+# Combine the count plot and percent-change plot
+subplot(plot_units_count,
+        plot_units_change,
+        nrows = 2, shareX = TRUE, margin = 0.04) %>% 
+  # Add plot titles to the subplots 
+  plotly_add_subplot_title(text = "Rental units available in Riverside") %>% 
+  plotly_add_subplot_title(text = "Percent changes in available units",
+                           y = 0.45) %>% 
+  # Add back the year labels for the count plot
+  layout(annotations = list(
+    x = min_year:max_year,
+    y = -12,
+    yanchor = "paper",
+    text = min_year:max_year,
+    showarrow = FALSE
+  )) %>% 
+  # Disable zoom & hide the mode bar
+  plotly_disable_zoom() %>%
+  plotly_hide_modebar() %>% 
+  # Hide legends
+  layout(showlegend = FALSE)
+
 ```
 
 

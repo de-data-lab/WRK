@@ -184,7 +184,9 @@ subplot(plot_units_count,
   plotly_disable_zoom() %>%
   plotly_hide_modebar() %>% 
   # Hide legends
-  layout(showlegend = FALSE)
+  hide_legend() %>%
+  # Add caption
+  plotly_caption_hud()
 
 ```
 
@@ -225,10 +227,7 @@ pct_occupied_plot <- pct_occupied_joined %>%
                               size = 14),
                   showarrow = FALSE) %>% 
   # Add caption 
-  add_annotations(x = 1, y = -0.06,
-                  text = "Source: <a href='https://www.huduser.gov/portal/datasets/assthsg.html' target='_blank'>HUD</a>",
-                  showarrow = FALSE, xref ="paper", yref = "paper", 
-                  xanchor = "right", yanchor = "auto") %>%
+  plotly_caption_hud() %>% 
   # Remove axis labels since they are obvious
   # Add "%" suffix to the y-axis
   layout(yaxis = list(title = "",
@@ -308,7 +307,10 @@ plot_ly(x = ~year,
   # Disable zoom
   plotly_disable_zoom() %>%
   # Hide the mode bar
-  plotly_hide_modebar()
+  plotly_hide_modebar() %>%
+  # Add caption 
+  plotly_caption_hud()
+  
 ```
 
 

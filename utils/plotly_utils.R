@@ -37,3 +37,11 @@ format_plotly <- function(p) {
     layout(plot_bgcolor = "transparent",
            paper_bgcolor = "transparent")
 }
+
+plotly_remove_axis_titles <- function(p) {
+  # Remove axis title
+  p %>% 
+    layout(yaxis = list(title = ""),
+           xaxis = list(title = ""))
+}
+

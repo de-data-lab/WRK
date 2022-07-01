@@ -60,3 +60,12 @@ plotly_add_subplot_title <- function(p, text = "", x = 0, y = 1){
       )
     ))
 }
+
+plotly_caption_hud <- function(p){
+  # Add caption 
+  p %>% 
+    add_annotations(x = 1, y = -0.06,
+                    text = "Source: <a href='https://www.huduser.gov/portal/datasets/assthsg.html' target='_blank'>HUD</a>",
+                    showarrow = FALSE, xref ="paper", yref = "paper", 
+                    xanchor = "right", yanchor = "auto")
+}

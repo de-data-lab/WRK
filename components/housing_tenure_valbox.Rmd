@@ -1,19 +1,6 @@
 ### Average months since moved in
 
 ```{r}
-# Average months since moved in
-riverside_tenure <- hud_de %>%
-    filter(code == "10003003002") %>%
-  select(year, months_from_movein, pct_occupied, total_units) %>%
-  mutate(location = "riverside")
-
-DE_tenure <- hud_de %>%
-  group_by(year) %>%
-  summarise(months_from_movein = mean(months_from_movein, na.rm = TRUE),
-            pct_occupied = mean(pct_occupied, na.rm = TRUE),
-            total_units = mean(total_units, na.rm = TRUE)) %>%
-  mutate(location = "DE")
-
 # Combine the Riverside and DE data
 tenure_stacked <- riverside_tenure %>%
   bind_rows(DE_tenure)

@@ -135,7 +135,7 @@ plot_units_count <- riverside_total_units %>%
           y = ~total_units,
           color = I(WRK_primary_colors[["green"]])) %>% 
   # Add barplot and seth the hover text 
-  add_bars(hovertemplate = "In %{x}, Riverside had %{y} units <extra></extra>") %>%
+  add_bars(hovertemplate = "In %{x}, Riverside had %{y} public housing units <extra></extra>") %>%
   # Remove axis title
   plotly_remove_axis_titles()
 

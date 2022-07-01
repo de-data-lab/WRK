@@ -45,3 +45,18 @@ plotly_remove_axis_titles <- function(p) {
            xaxis = list(title = ""))
 }
 
+plotly_add_subplot_title <- function(p, text = "", x = 0, y = 1){
+  p %>% 
+    layout(annotations = list(
+      list(
+        x = x,
+        y = y,
+        text = text,
+        xref = "paper",
+        yref = "paper",
+        xanchor = "left",
+        yanchor = "bottom",
+        showarrow = FALSE
+      )
+    ))
+}

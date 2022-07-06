@@ -349,8 +349,8 @@ kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison
 
 ```{r, graduation-setup}
 # Load Graduation Data
-graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
-graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
+graduation <- read_rds(here("data/processed/education_graduation.rds"))
+graduation_gaps <- read_rds(here("data/processed/education_graduation_gaps.rds"))
 
 # Calculate statics for graduation
 # Graduation: Assume linear trend and calculate an average change

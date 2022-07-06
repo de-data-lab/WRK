@@ -344,6 +344,11 @@ kinder_WRK_DE_comparison_list <- kinder_WRK_DE_comparison %>%
   deframe() %>% as.list()
 kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison_list$Delaware) /
   kinder_WRK_DE_comparison_list$Delaware
+
+# Data heights
+edu_valbox_height = 50
+edu_plot_height = 500
+edu_notes_height = 80
 ```
 
 
@@ -383,7 +388,7 @@ Column 1: Kindergarten Readiness
 ```
 
 
-### Kindergarten Readiness {data-height=500}
+### Kindergarten Readiness {data-height=`r edu_plot_height`}
 
 ```{r}
 # Render the kindergarten readiness plot

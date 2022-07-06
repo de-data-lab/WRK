@@ -28,6 +28,15 @@ source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
 source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
+source(here("R/plotly_add_annotation.R"))
+# Education
+source(here("R/render_kinder_readiness.R"))
+source(here("R/get_summary_education_kinder.R"))
+source(here("R/render_dumbbell.R"))
+source(here("R/get_achievement_texts.R"))
+source(here("R/render_dumbbell_grad_gap.R"))
+source(here("R/plotly_caption_source.R"))
+
 
 ## Load HUD Data 
 hud_de <- read_rds(here("data/processed/hud_DE_combined.rds"))

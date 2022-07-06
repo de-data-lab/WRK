@@ -386,26 +386,9 @@ Column 1: Kindergarten Readiness
 ### Kindergarten Readiness {data-height=500}
 
 ```{r}
-# Delaware Average 
-kinder_plot <- all_kinder %>%
-  ggplot(aes(x = year, y = kinder_ready_prop, color = location)) +
-  geom_line() +
-  geom_point() +
-  scale_y_continuous(labels = scales::label_percent()) +
-  annotate("text", x = 2020, y = 0.75, label = "WRK",
-           color = get_wrk_color("green")) +
-  annotate("text", x = 2017, y = 0.625, label = "Delaware",
-           color = get_wrk_color("blue")) +
-  labs(title = "Children ready for kindergarten",
-       x = NULL, y = NULL,
-       caption = "Source: KidsCount",
-       color = NULL) +
-  guides(color = "none") +
-  scale_color_manual(values = wrk_pal()(2)) +
-  theme_minimal()
-
-# Render the plot
-renderPlot({kinder_plot}, res = 85)
+# Render the kindergarten readiness plot
+all_kinder %>% 
+  render_kinder_readiness()
 ```
 
 

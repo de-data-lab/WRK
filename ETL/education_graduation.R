@@ -1,4 +1,4 @@
-# Get Student Graduation Data from Open Data Delaware
+# Get Student Graduation Data from Delaware Open Data
 # https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn
 
 library(here)
@@ -7,7 +7,7 @@ library(RColorBrewer)
 source(here("utils/get_de_open_data.R"))
 source(here("utils/wrk_pal.R"))
 
-# Function to query the Open Data Delaware API
+# Function to query the Delaware Open Data API
 
 # Get data for East Side and Edison Schools
 # Note: This does not work since the dataset does not contain data for these schools
@@ -60,21 +60,31 @@ graduation_joined <- graduation_joined %>%
                                   .default = "Brandywine, Christina, or Colonial"))
 
 # Save the dataset
-write_rds(graduation_joined, here("data/processed/workforce_graduation.rds"))
+write_rds(graduation_joined, here("data/processed/education_graduation.rds"))
 
 
 # Produce the wide file where one row represents a year ------------------------
 graduation_gaps  <- graduation_joined %>%
+  # Focus on 4-year graduation
+  filter(ratetype == "4-year graduation rate") %>% 
   group_by(schoolyear, compare_w_state) %>%
   summarise(pctgraduates = mean(pctgraduates))
 
+# Recode the comapre_with labels for pivoting
+graduation_gaps  <- graduation_gaps %>% 
+  mutate(group_level = recode(compare_w_state,
+                              "State of Delaware" = "delaware",
+                              "Brandywine, Christina, or Colonial" = "brandywine_christina_colonial"))
+
 graduation_gaps_wide <- graduation_gaps %>%
   ungroup() %>%
-  pivot_wider(names_from = compare_w_state, values_from = pctgraduates)
+  select(-compare_w_state) %>%
+  pivot_wider(names_from = group_level,
+              values_from = pctgraduates)
 
 # Calculate the gap
 graduation_gaps_wide <- graduation_gaps_wide %>%
-  mutate(gap = `Brandywine, Christina, or Colonial` - `State of Delaware`)
+  mutate(gap = brandywine_christina_colonial - delaware)
 
 # Add a color palette
 color_palette <- brewer.pal(n = 3, name = "Pastel1")
@@ -84,4 +94,4 @@ graduation_gaps_wide <- graduation_gaps_wide %>%
                                                         colorname = "yellow")))
 
 # Save the dataset
-write_rds(graduation_gaps_wide, here("data/processed/workforce_graduation_gaps.rds"))
+write_rds(graduation_gaps_wide, here("data/processed/education_graduation_gaps.rds"))

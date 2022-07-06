@@ -28,6 +28,15 @@ source(here("utils/plot_achievement.R"))
 source(here("utils/print_pct.R"))
 source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
+source(here("R/plotly_add_annotation.R"))
+# Education
+source(here("R/render_kinder_readiness.R"))
+source(here("R/get_summary_education_kinder.R"))
+source(here("R/render_dumbbell.R"))
+source(here("R/get_achievement_texts.R"))
+source(here("R/render_dumbbell_grad_gap.R"))
+source(here("R/plotly_caption_source.R"))
+
 
 ## Load HUD Data 
 hud_de <- read_rds(here("data/processed/hud_DE_combined.rds"))
@@ -317,20 +326,8 @@ plot_ly(x = ~year,
 
 # Education {data-orientation=columns}
 ```{r, education-setup}
-kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
-DE_kinder <- kinder_readiness_DE_wide %>%
-  transmute(year = TimeFrame,location = Location,
-            kinder_ready_prop = mean)
-
-WRK_wide <-
-read_rds(here("data/processed/education_kinder_readiness_WRK.rds"))
-
-WRK_kinder <- WRK_wide %>%
-  transmute(year = year, location = "WRK",
-            kinder_ready_prop = kinder_ready_prop)
-
-all_kinder <- DE_kinder %>%
-  bind_rows(WRK_kinder)
+# Get the kinder summary table
+all_kinder <- get_summary_education_kinder()
 
 # Calculate the readiness average over years
 kinder_WRK_DE_comparison <- all_kinder %>%
@@ -347,13 +344,18 @@ kinder_WRK_DE_comparison_list <- kinder_WRK_DE_comparison %>%
   deframe() %>% as.list()
 kinder_pct_diff <- (kinder_WRK_DE_comparison_list$WRK - kinder_WRK_DE_comparison_list$Delaware) /
   kinder_WRK_DE_comparison_list$Delaware
+
+# Data heights
+edu_valbox_height = 50
+edu_plot_height = 500
+edu_notes_height = 80
 ```
 
 
 ```{r, graduation-setup}
 # Load Graduation Data
-graduation <- read_rds(here("data/processed/workforce_graduation.rds"))
-graduation_gaps <- read_rds(here("data/processed/workforce_graduation_gaps.rds"))
+graduation <- read_rds(here("data/processed/education_graduation.rds"))
+graduation_gaps <- read_rds(here("data/processed/education_graduation_gaps.rds"))
 
 # Calculate statics for graduation
 # Graduation: Assume linear trend and calculate an average change
@@ -386,35 +388,20 @@ Column 1: Kindergarten Readiness
 ```
 
 
-### Kindergarten Readiness {data-height=500}
+### Kindergarten Readiness {data-height=`r edu_plot_height`}
 
 ```{r}
-# Delaware Average 
-kinder_plot <- all_kinder %>%
-  ggplot(aes(x = year, y = kinder_ready_prop, color = location)) +
-  geom_line() +
-  geom_point() +
-  scale_y_continuous(labels = scales::label_percent()) +
-  annotate("text", x = 2020, y = 0.75, label = "WRK",
-           color = get_wrk_color("green")) +
-  annotate("text", x = 2017, y = 0.625, label = "Delaware",
-           color = get_wrk_color("blue")) +
-  labs(title = "Children ready for kindergarten",
-       x = NULL, y = NULL,
-       caption = "Source: KidsCount",
-       color = NULL) +
-  guides(color = "none") +
-  scale_color_manual(values = wrk_pal()(2)) +
-  theme_minimal()
-
-# Render the plot
-renderPlot({kinder_plot}, res = 85)
+# Render the kindergarten readiness plot
+all_kinder %>% 
+  render_kinder_readiness()
 ```
 
 
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
 
-On average, `r kinder_txt["WRK"]` of children in WRK group were kindergarten ready (2019-2021), compared to `r kinder_txt["Delaware"]` of children in Delaware (2016-2019). The rate of kindergarden readiness in WRK group is `r print_pct(kinder_pct_diff)` more than that of Delaware.
+- On average, `r kinder_txt["WRK"]` of children in WRK group were kindergarten ready (2019-2021), compared to `r kinder_txt["Delaware"]` of children in Delaware (2016-2019). 
+
+- The rate of kindergarden readiness in WRK group is `r print_pct(kinder_pct_diff)` more than that of Delaware.
 
 
 Column 2: Literacy
@@ -422,12 +409,16 @@ Column 2: Literacy
 
 ```{r, literacy-setup}
 # Load Data
+# Data are aggregates of 3rd to 8th graders
 ELA <- read_rds(here("data/processed/education_achievement_wide_ELA.rds"))
 
 # Get the eastside
 eastside_ELA <- ELA %>%
   select(schoolyear, east_side, delaware) %>%
-  mutate(gap = east_side - delaware)
+  mutate(gap = east_side - delaware) %>% 
+  # Set colors depending on the direction of the gap (+/-)
+  mutate(gap_color = case_when(gap < 0 ~ get_wrk_color("yellow", palette = "secondary"),
+                               gap >= 0 ~ get_wrk_color("green")))
 
 # Linear changes over years (2015-2021)
 eastside_ELA_lm <- eastside_ELA %>%
@@ -438,42 +429,37 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 ```
 
 ```{r child='components/education_literacy_valbox.Rmd'}
-### Improvement in literacy achievement gap to Delaware {data-height=100}
+### Improvement in literacy achievement gap to Delaware
 ```
 
 
-### Literacy Achievement {data-height=500}
+### Literacy Achievement  {data-height=`r edu_plot_height`}
 
 ```{r}
-# Literacy Details Plot
-ELA_plot <- eastside_ELA %>%
-  ggplot(aes(x = schoolyear, y = gap)) +
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1,
-               color = get_wrk_color(palette = "secondary",
-                                     colorname = "yellow")) + 
-  geom_point(size = 3, 
-             color = get_wrk_color(palette = "secondary",
-                                     colorname = "yellow")) +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2016.5, y = 1.5, label = "Delaware Average", 
-           color = get_wrk_color("blue")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(title = "Literacy achievement gap",
-       x = NULL,
-       y = NULL,
-       caption = "Source: Delaware Open Data \nData points: East Side Charter students.") +
-  theme_minimal()
-
-# Render plot
-renderPlot({ ELA_plot }, res = 80)
+# Render a plot for the literacy achievement
+eastside_ELA %>%
+  render_dumbbell(area = "ELA")
 ```
 
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
 
+```{r}
+# Create values for plotting
+# Get the latest year
+ELA_latest <- eastside_ELA %>% 
+  filter(schoolyear == max(schoolyear)) %>% 
+  mutate(across(where(is.numeric), round, 1))
+# Get the text indicating the direction
+ELA_direction_text <- 
+  case_when(eastside_ELA_gap_coeff > 0 ~ "improving",
+            eastside_ELA_gap_coeff == 0 ~ "staying the same",
+            eastside_ELA_gap_coeff < 0 ~ "worsening")
+```
+
+
+- In `r ELA_latest$schoolyear`, `r ELA_latest$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the literacy proficiency. 
+
+- The gap to the Delaware average (`r ELA_latest$delaware`%) was `r ELA_latest$gap`%. The gap has been `r ELA_direction_text` by `r eastside_ELA_gap_coeff %>% round(1)`% a year.
  
 Column 3: Math
 -----------------------------------------------------------------------
@@ -498,36 +484,26 @@ eastside_math_gap_coeff <- eastside_math_lm$coefficients[["schoolyear"]]
 # Improvement in math achievement gap to Delaware 
 ```
 
-### Math Achievement {data-height=500}
+### Math Achievement  {data-height=`r edu_plot_height`}
 
 ```{r}
 # Create a plot for math achievement gap
-math_plot <- eastside_math %>%
-  ggplot(aes(x = schoolyear, y = gap)) +
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1,
-               color = get_wrk_color(palette = "secondary", 
-                                     colorname = "yellow")) + 
-  geom_point(size = 3, 
-             color = get_wrk_color(palette = "secondary", 
-                                     colorname = "yellow")) +
-  geom_hline(yintercept = 0, linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2016.5, y = 1.25,
-           label = "Delaware Average", 
-           color = get_wrk_color("blue")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(title = "Math achievement gap",
-       x = NULL,
-       y = NULL,
-       caption = "Source: Delaware Open Data \nData points: East Side Charter students.") +
-  theme_minimal()
-
-renderPlot({math_plot}, res = 80)
+eastside_math %>% 
+  render_dumbbell(area = "math")
 ```
 
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
+
+```{r}
+# Get the needed info for rendering the text
+eastside_math_texts <- get_achievement_texts(eastside_math, eastside_math_gap_coeff)
+```
+
+
+- In `r eastside_math_texts$df$schoolyear`, `r eastside_math_texts$df$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the math proficiency. 
+
+- The gap to the Delaware average (`r eastside_math_texts$df$delaware`%) was `r eastside_math_texts$df$gap`%. The gap has been `r eastside_math_texts$direction_text` by `r eastside_math_texts$coeff %>% round(1)`% a year.
+
 
 Column 4: Graduation Rate
 -----------------------------------------------------------------------
@@ -538,41 +514,17 @@ Column 4: Graduation Rate
 ```
 
 
-### Graduation Gap {data-height=500}
+### Graduation Gap  {data-height=`r edu_plot_height`}
 
 ```{r}
 # Plot the gap with the state average
-grad_gap_plot <- graduation_gaps %>%
-  mutate(after_2016 = schoolyear >= 2016) %>%
-  ggplot(aes(x = schoolyear, y = gap, color = I(plot_color))) +
-  geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
-              method = "lm", se = FALSE,
-              color = get_wrk_color("green"),
-              linetype = "dotted") + 
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1.2) + 
-  geom_point(size = 5) +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2015, y = 0.25,
-           label = "Delaware Average", color = get_wrk_color("blue")) +
-  labs(y = NULL,
-       x = NULL,
-       title = "High school graduation gap") +
-  guides(color = "none") +
-  scale_y_continuous(labels = ~sprintf("%.1f%%", .), limits = c(NA, NA)) + 
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(caption = "Data source: DE Open Data \n 
-                  Data points are the aggregates among Brandywine, Christiana, & Colonial School districts.") +
-  theme_minimal() 
-
-renderPlot({grad_gap_plot}, res = 80)
+# TODO: Combine this with the render_dumbell.R
+graduation_gaps %>% 
+  render_dumbbell_gap()
 ```
 
 
-
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
 
 - On average, the gaps in the graduation rate with the 
 state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  

@@ -326,20 +326,8 @@ plot_ly(x = ~year,
 
 # Education {data-orientation=columns}
 ```{r, education-setup}
-kinder_readiness_DE_wide <- read_rds(here("data/processed/education_kinder_readiness_wide.rds"))
-DE_kinder <- kinder_readiness_DE_wide %>%
-  transmute(year = TimeFrame,location = Location,
-            kinder_ready_prop = mean)
-
-WRK_wide <-
-read_rds(here("data/processed/education_kinder_readiness_WRK.rds"))
-
-WRK_kinder <- WRK_wide %>%
-  transmute(year = year, location = "WRK",
-            kinder_ready_prop = kinder_ready_prop)
-
-all_kinder <- DE_kinder %>%
-  bind_rows(WRK_kinder)
+# Get the kinder summary table
+all_kinder <- get_summary_education_kinder()
 
 # Calculate the readiness average over years
 kinder_WRK_DE_comparison <- all_kinder %>%

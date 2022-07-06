@@ -509,41 +509,17 @@ Column 4: Graduation Rate
 ```
 
 
-### Graduation Gap {data-height=500}
+### Graduation Gap  {data-height=`r edu_plot_height`}
 
 ```{r}
 # Plot the gap with the state average
-grad_gap_plot <- graduation_gaps %>%
-  mutate(after_2016 = schoolyear >= 2016) %>%
-  ggplot(aes(x = schoolyear, y = gap, color = I(plot_color))) +
-  geom_smooth(data = subset(graduation_gaps, schoolyear >= 2016),
-              method = "lm", se = FALSE,
-              color = get_wrk_color("green"),
-              linetype = "dotted") + 
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1.2) + 
-  geom_point(size = 5) +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2015, y = 0.25,
-           label = "Delaware Average", color = get_wrk_color("blue")) +
-  labs(y = NULL,
-       x = NULL,
-       title = "High school graduation gap") +
-  guides(color = "none") +
-  scale_y_continuous(labels = ~sprintf("%.1f%%", .), limits = c(NA, NA)) + 
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(caption = "Data source: DE Open Data \n 
-                  Data points are the aggregates among Brandywine, Christiana, & Colonial School districts.") +
-  theme_minimal() 
-
-renderPlot({grad_gap_plot}, res = 80)
+# TODO: Combine this with the render_dumbell.R
+graduation_gaps %>% 
+  render_dumbbell_gap()
 ```
 
 
-
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
 
 - On average, the gaps in the graduation rate with the 
 state average worsened by `r gap_yearly_change` per year from `r start_year` to `r end_year`.  

@@ -479,36 +479,26 @@ eastside_math_gap_coeff <- eastside_math_lm$coefficients[["schoolyear"]]
 # Improvement in math achievement gap to Delaware 
 ```
 
-### Math Achievement {data-height=500}
+### Math Achievement  {data-height=`r edu_plot_height`}
 
 ```{r}
 # Create a plot for math achievement gap
-math_plot <- eastside_math %>%
-  ggplot(aes(x = schoolyear, y = gap)) +
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1,
-               color = get_wrk_color(palette = "secondary", 
-                                     colorname = "yellow")) + 
-  geom_point(size = 3, 
-             color = get_wrk_color(palette = "secondary", 
-                                     colorname = "yellow")) +
-  geom_hline(yintercept = 0, linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2016.5, y = 1.25,
-           label = "Delaware Average", 
-           color = get_wrk_color("blue")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(title = "Math achievement gap",
-       x = NULL,
-       y = NULL,
-       caption = "Source: Delaware Open Data \nData points: East Side Charter students.") +
-  theme_minimal()
-
-renderPlot({math_plot}, res = 80)
+eastside_math %>% 
+  render_dumbbell(area = "math")
 ```
 
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
+
+```{r}
+# Get the needed info for rendering the text
+eastside_math_texts <- get_achievement_texts(eastside_math, eastside_math_gap_coeff)
+```
+
+
+- In `r eastside_math_texts$df$schoolyear`, `r eastside_math_texts$df$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the math proficiency. 
+
+- The gap to the Delaware average (`r eastside_math_texts$df$delaware`%) was `r eastside_math_texts$df$gap`%. The gap has been `r eastside_math_texts$direction_text` by `r eastside_math_texts$coeff %>% round(1)`% a year.
+
 
 Column 4: Graduation Rate
 -----------------------------------------------------------------------

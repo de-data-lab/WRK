@@ -404,12 +404,16 @@ Column 2: Literacy
 
 ```{r, literacy-setup}
 # Load Data
+# Data are aggregates of 3rd to 8th graders
 ELA <- read_rds(here("data/processed/education_achievement_wide_ELA.rds"))
 
 # Get the eastside
 eastside_ELA <- ELA %>%
   select(schoolyear, east_side, delaware) %>%
-  mutate(gap = east_side - delaware)
+  mutate(gap = east_side - delaware) %>% 
+  # Set colors depending on the direction of the gap (+/-)
+  mutate(gap_color = case_when(gap < 0 ~ get_wrk_color("yellow", palette = "secondary"),
+                               gap >= 0 ~ get_wrk_color("green")))
 
 # Linear changes over years (2015-2021)
 eastside_ELA_lm <- eastside_ELA %>%
@@ -420,42 +424,37 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 ```
 
 ```{r child='components/education_literacy_valbox.Rmd'}
-### Improvement in literacy achievement gap to Delaware {data-height=100}
+### Improvement in literacy achievement gap to Delaware
 ```
 
 
-### Literacy Achievement {data-height=500}
+### Literacy Achievement  {data-height=`r edu_plot_height`}
 
 ```{r}
-# Literacy Details Plot
-ELA_plot <- eastside_ELA %>%
-  ggplot(aes(x = schoolyear, y = gap)) +
-  geom_segment(aes(x = schoolyear, xend = schoolyear, y = 0, yend = gap),
-               size = 1,
-               color = get_wrk_color(palette = "secondary",
-                                     colorname = "yellow")) + 
-  geom_point(size = 3, 
-             color = get_wrk_color(palette = "secondary",
-                                     colorname = "yellow")) +
-  geom_hline(yintercept = 0,
-             linetype = "dashed",
-             color = get_wrk_color("blue")) + 
-  annotate("text", x = 2016.5, y = 1.5, label = "Delaware Average", 
-           color = get_wrk_color("blue")) +
-  scale_y_continuous(labels = ~paste0(., "%")) +
-  scale_x_continuous(breaks = scales::breaks_pretty()) +
-  labs(title = "Literacy achievement gap",
-       x = NULL,
-       y = NULL,
-       caption = "Source: Delaware Open Data \nData points: East Side Charter students.") +
-  theme_minimal()
-
-# Render plot
-renderPlot({ ELA_plot }, res = 80)
+# Render a plot for the literacy achievement
+eastside_ELA %>%
+  render_dumbbell(area = "ELA")
 ```
 
-### Notes {data-height=150}
+### Notes {data-height=`r edu_notes_height`}
 
+```{r}
+# Create values for plotting
+# Get the latest year
+ELA_latest <- eastside_ELA %>% 
+  filter(schoolyear == max(schoolyear)) %>% 
+  mutate(across(where(is.numeric), round, 1))
+# Get the text indicating the direction
+ELA_direction_text <- 
+  case_when(eastside_ELA_gap_coeff > 0 ~ "improving",
+            eastside_ELA_gap_coeff == 0 ~ "staying the same",
+            eastside_ELA_gap_coeff < 0 ~ "worsening")
+```
+
+
+- In `r ELA_latest$schoolyear`, `r ELA_latest$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the literacy proficiency. 
+
+- The gap to the Delaware average (`r ELA_latest$delaware`%) was `r ELA_latest$gap`%. The gap has been `r ELA_direction_text` by `r eastside_ELA_gap_coeff %>% round(1)`% a year.
  
 Column 3: Math
 -----------------------------------------------------------------------

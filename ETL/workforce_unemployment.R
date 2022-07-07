@@ -25,17 +25,28 @@ unemployment_vars <- c("unemployed" = "B23025_005",
                        "total_labor_force" =  "B23025_003")
 
 get_acs_unemployment <- function(year){ 
-  get_acs(geography = "tract",
-          variables = unemployment_vars,
-          state = "DE",
-          year = year,
-          output = "wide")
+  tryCatch(
+    # Try quering
+    get_acs(geography = "tract",
+            variables = unemployment_vars,
+            state = "DE",
+            year = year,
+            output = "wide"),
+    # In case of an error, print out an error message
+    error = function(e) cat("Error getting data from Census API")
+  )
 }
 
 # 5-year ACS data is available from 2009 through 2020
 # But the unemployment variable (B23025_005) is only available 2011 onwards
 # Note: The end year should be adjusted when new data become available
-target_years <- 2011:2020 
+current_year <- Sys.Date() %>% format(., "%Y") %>% as.numeric()
+target_years <- 2011:current_year 
+
+# Target Census Tracts
+target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
+                   "CT 6.01" = "10003000601",
+                   "CT 6.02" = "10003000602")
 
 # Create a container table
 de_unemployment <- tibble("year" = target_years)

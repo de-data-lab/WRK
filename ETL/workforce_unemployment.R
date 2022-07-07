@@ -72,27 +72,34 @@ de_unemployment <- de_unemployment %>%
 write_rds(de_unemployment, here("data/processed/workforce_unemployment.rds"))
 
 # Transform into summary tables
-unemployment_de <- unemployment %>%
+unemployment_summary_de <- de_unemployment %>%
   group_by(year) %>%
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
   mutate(label = "Delaware")
 
-unemployment_wilmington <- unemployment %>%
+unemployment_summary_wilmington <- de_unemployment %>%
   filter(NAME_place == "Wilmington") %>% 
   group_by(year) %>%
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
   mutate(label = "Wilmington")
 
-unemployment_target_tracts <- unemployment %>%
+unemployment_summary_target_tracts <- de_unemployment %>%
   filter(GEOID %in% target_tracts) %>%
   group_by(year) %>%
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
   mutate(label = "WRK")
 
+unemployment_summary_riverside <- de_unemployment %>%
+  filter(GEOID == "10003003002") %>%
+  group_by(year) %>%
+  summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
+  mutate(label = "Riverside")
+
 # Long format
-unemployment_summary_long <- unemployment_de %>%
-  bind_rows(unemployment_wilmington) %>%
-  bind_rows(unemployment_target_tracts)
+unemployment_summary_long <- unemployment_summary_de %>%
+  bind_rows(unemployment_summary_wilmington) %>%
+  bind_rows(unemployment_summary_target_tracts) %>%
+  bind_rows(unemployment_summary_riverside)
 
 # Wide format - each row is a year
 unemployment_summary_wide <- unemployment_summary_long %>%

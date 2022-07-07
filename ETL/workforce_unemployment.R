@@ -71,8 +71,6 @@ de_unemployment <- de_unemployment %>%
 # Long format
 write_rds(de_unemployment, here("data/processed/workforce_unemployment.rds"))
 
-
-
 # Transform into summary tables
 unemployment_de <- unemployment %>%
   group_by(year) %>%

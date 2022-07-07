@@ -223,7 +223,7 @@ pct_occupied_plot <- pct_occupied_joined %>%
             hoveron = "points",
             hovertext = ~hovertext,
             hoverinfo = "text",
-            colors = wrk_pal()(2)) %>%
+            colors = c(Delaware = "gray", Riverside = get_wrk_color("green"))) %>%
   # Add annotations for Riverside vs. Wilmington
   add_annotations(x = 2018, y = 97,
                   text = "Riverside",
@@ -232,18 +232,20 @@ pct_occupied_plot <- pct_occupied_joined %>%
                   showarrow = FALSE) %>% 
   add_annotations(x = 2020, y = 91,
                   text = "Delaware",
-                  font = list(color = get_wrk_color("blue"),
+                  font = list(color = "gray",
                               size = 14),
                   showarrow = FALSE) %>% 
   # Add caption 
   plotly_caption_hud() %>% 
   # Remove axis labels since they are obvious
+  plotly_remove_axis_titles() %>%
   # Add "%" suffix to the y-axis
-  layout(yaxis = list(title = "",
-                      ticksuffix = "%"),
-         xaxis = list(title = ""),
-         title = list(text = "Rental units occupied (%)",
+  layout(yaxis = list(ticksuffix = "%")) %>%
+  # Add title to the plot
+  layout(title = list(text = "Rental units occupied (%)",
                       xanchor = "left", x = 0)) %>% 
+  # Remove the x-grid
+  layout(xaxis = list(showgrid = FALSE)) %>%
   hide_legend() %>% 
   plotly_hide_modebar() %>%
   plotly_disable_zoom() 

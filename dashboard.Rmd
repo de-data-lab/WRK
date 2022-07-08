@@ -544,18 +544,25 @@ Column 1: Unemployment
 # Load Data
 unemployment <- read_rds(here("data/processed/workforce_unemployment.rds"))
 unemployment_summary_long <- read_rds(here("data/processed/workforce_unemployment_sum_long.rds"))
-unemployment_summary_wide <- read_rds(here("data/processed/workforce_unemployment_sum_wide.rds"))
+# Create the plot for unemployment gap against Wilmington
+employed_wide <- unemployment_summary_long %>% 
+  mutate(employed_prop = 1 - unemployed_prop) %>%
+  select(-unemployed_prop) %>%
+  pivot_wider(names_from = label, values_from = employed_prop) %>% 
+  # Calculate gaps to the parent geographies
+  mutate(across(c(WRK, Riverside, Eastlake, Northeast), function(x) x - Delaware, .names = "{.col}_gap_to_Delaware")) %>%
+  mutate(across(c(WRK, Riverside, Eastlake, Northeast), function(x) x - Wilmington, .names = "{.col}_gap_to_Wilmington"))
 
 # Unemployment 
-unemployment_gaps_lm <- lm(data = unemployment_summary_wide,
-                           formula = gap_to_Wilmington ~ year)
-unemployment_gaps_yearly_change <- sprintf(fmt = "%.1f%%", unemployment_gaps_lm$coefficients["year"] * 100)
-unemployment_start_year <- unemployment_gaps_lm$model$year %>% min()
-unemployment_end_year <-  unemployment_gaps_lm$model$year %>% max()
-unemployment_gaps_lm_2017 <- unemployment_summary_wide %>%
+employed_WRK_gap_to_wilmingon_lm <- lm(data = employed_wide,
+                                       formula = WRK_gap_to_Wilmington ~ year)
+employed_gaps_yearly_change <- sprintf(fmt = "%.1f%%", employed_WRK_gap_to_wilmingon_lm$coefficients["year"] * 100)
+employed_start_year <- employed_WRK_gap_to_wilmingon_lm$model$year %>% min()
+employed_end_year <-  employed_WRK_gap_to_wilmingon_lm$model$year %>% max()
+employed_gaps_lm_2017 <- employed_wide %>%
   filter(year >= 2017) %>%
-  lm(data = ., formula = gap_to_Wilmington ~ year)
-unemployment_gaps_yearly_change_2017 <- unemployment_gaps_lm_2017$coefficients["year"] * 100
+  lm(data = ., formula = WRK_gap_to_Wilmington ~ year)
+employed_gaps_yearly_change_2017 <- employed_gaps_lm_2017$coefficients["year"] * 100
 ```
 
 

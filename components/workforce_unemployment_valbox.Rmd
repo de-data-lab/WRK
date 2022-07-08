@@ -1,13 +1,13 @@
-### Unemployment gaps to Wilmington, since 2017
+### Change in employment gaps to Wilmington since 2017
 
 ```{r}
-unemployment_box_color <- case_when(unemployment_gaps_yearly_change_2017 >= 0 ~ "warning",
-                                    unemployment_gaps_yearly_change_2017 < 0 ~ "success")
-unemployment_text <- unemployment_gaps_yearly_change_2017 %>%
+employed_box_color <- case_when(employed_gaps_yearly_change_2017 <= 0 ~ "warning",
+                                  employed_gaps_yearly_change_2017 > 0 ~ "success")
+unemployment_text <- employed_gaps_yearly_change_2017 %>%
   sprintf(fmt = "%+.1f%%", .)
 
 unemployment_text %>%  
   paste0("/year") %>%
   valueBox(icon = "fa-briefcase",
-           color = unemployment_box_color)
+           color = employed_box_color)
 ```

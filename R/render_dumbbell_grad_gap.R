@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-render_dumbbell_gap <- function(summary_df) {
+render_dumbbell_grad_gap <- function(summary_df) {
   # Set the title size
   title_size <- 14
   

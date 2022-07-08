@@ -29,10 +29,11 @@ source(here("utils/print_pct.R"))
 source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
 source(here("R/plotly_add_annotation.R"))
+source(here("R/plotly_dumbbell.R"))
 # Education
 source(here("R/render_kinder_readiness.R"))
 source(here("R/get_summary_education_kinder.R"))
-source(here("R/render_dumbbell.R"))
+source(here("R/render_dumbbell_achievements.R"))
 source(here("R/get_achievement_texts.R"))
 source(here("R/render_dumbbell_grad_gap.R"))
 source(here("R/plotly_caption_source.R"))
@@ -440,7 +441,7 @@ eastside_ELA_gap_coeff <- eastside_ELA_lm$coefficients[["schoolyear"]]
 ```{r}
 # Render a plot for the literacy achievement
 eastside_ELA %>%
-  render_dumbbell(area = "ELA")
+  render_dumbbell_achievements(area = "ELA")
 ```
 
 ### Notes {data-height=`r edu_notes_height`}
@@ -491,7 +492,7 @@ eastside_math_gap_coeff <- eastside_math_lm$coefficients[["schoolyear"]]
 ```{r}
 # Create a plot for math achievement gap
 eastside_math %>% 
-  render_dumbbell(area = "math")
+  render_dumbbell_achievements(area = "math")
 ```
 
 ### Notes {data-height=`r edu_notes_height`}

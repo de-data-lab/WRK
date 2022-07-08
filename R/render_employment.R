@@ -22,6 +22,9 @@ render_employment <- function(.data, level = "WRK", compare_to = "Wilmington") {
   target_hovertemplate <- str_glue("In {level_label}, %{{y:,.1%}} of workers were employed in %{{x}}.
   The gap to {compare_to} was %{{text:+,.1%}} <extra></extra>")
   
+  # Set Plot title
+  plot_title <- str_glue("Employment rate of {level_label} compared to {compare_to}")
+  
   # Determine the positions of the annotations
   offset <- 0.01
   # Get the latest year 
@@ -64,7 +67,7 @@ render_employment <- function(.data, level = "WRK", compare_to = "Wilmington") {
                           color = "grey",
                           size = 12) %>%
     # Add title
-    add_title(str_glue("Employment rate of {level_label} compared to {compare_to}")) %>%
+    add_title(plot_title) %>%
     # Add source
     plotly_caption_source("Census 5-year ACS",
                           href = "https://www.census.gov/")

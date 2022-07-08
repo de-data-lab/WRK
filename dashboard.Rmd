@@ -30,6 +30,8 @@ source(here("utils/plotly_utils.R"))
 source(here("utils/wrk_pal.R"))
 source(here("R/plotly_add_annotation.R"))
 source(here("R/plotly_dumbbell.R"))
+source(here("R/str_wrap_hovertemplate.R"))
+source(here("R/add_title.R"))
 # Education
 source(here("R/render_kinder_readiness.R"))
 source(here("R/get_summary_education_kinder.R"))
@@ -37,6 +39,9 @@ source(here("R/render_dumbbell_achievements.R"))
 source(here("R/get_achievement_texts.R"))
 source(here("R/render_dumbbell_grad_gap.R"))
 source(here("R/plotly_caption_source.R"))
+# Workforce Development
+source(here("R/render_employment.R"))
+source(here("R/plotly_add_employed_line.R"))
 
 
 ## Load HUD Data 
@@ -521,9 +526,8 @@ Column 4: Graduation Rate
 
 ```{r}
 # Plot the gap with the state average
-# TODO: Combine this with the render_dumbell.R
 graduation_gaps %>% 
-  render_dumbbell_gap()
+  render_dumbbell_grad_gap()
 ```
 
 
@@ -571,59 +575,101 @@ employed_gaps_yearly_change_2017 <- employed_gaps_lm_2017$coefficients["year"] *
 ```
 
 
-### &nbsp; {-}
-```{r}
-# Create the plot for unemployment gap against Wilmington
-unemployment_plot <- unemployment_summary_wide %>%   
-  ggplot(aes(x = year, y = gap_to_Wilmington)) +
-  geom_segment(aes(x = year, 
-                   xend = year,
-                   y = 0, yend = gap_to_Wilmington),
-               size = 1.2,
-               color = get_wrk_color("yellow", "secondary")) + 
-  geom_point(size = 5, color = get_wrk_color("yellow", "secondary")) +
-  geom_hline(yintercept = 0, linetype = "dashed",
-             color = get_wrk_color("blue")) +
-  annotate("text", label = "Wilmington average", x = 2011.5, y = -0.005,
-           color = get_wrk_color("blue")) + 
-  labs(y = NULL, x = NULL,
-       title = "Gaps in unemployment rate vs. Wilmington",
-       color = NULL) +
-  scale_y_continuous(labels = scales::label_percent()) + 
-  scale_x_continuous(breaks = scales::pretty_breaks()) + 
-  labs(caption = "Data source: 5-year ACS") +
-  theme_minimal()
 
-# Combine two plots and render
-renderPlot({unemployment_plot}, res = 90)
+### Employment rate
+
+```{r}
+# Get the list of target employments
+employment_plot_targets <- c("WRK", "Riverside", "Eastlake", "Northeast")
+employment_plots <- employment_plot_targets %>% 
+  map(render_employment,
+      .data = employed_wide, compare_to = "Wilmington")
+names(employment_plots) <- employment_plot_targets
+
+
+# Render to the page
+tab_margin <- c(class = "m-4")
+tabsetPanel(
+  tabPanel("WRK Group Tracts",
+           renderPlotly({ employment_plots$WRK }), 
+           !!!tab_margin),
+  tabPanel("Riverside (30.02)",
+           renderPlotly({ employment_plots$Riverside }),
+           !!!tab_margin),
+  tabPanel("Eastlake (60.01)",
+           renderPlotly({ employment_plots$Eastlake }),
+           !!!tab_margin),
+  tabPanel("Northeast (6.02)",
+           renderPlotly({{ employment_plots$Northeast }}),
+           !!!tab_margin)
+)
+
 ```
 
 
-### &nbsp; {-}
+
+### Notes {data-height=100}
+
+- In the 3 census tracts served by the WRK group, the gap in employment rate to the Wilmington's employment rate have been improving on average
+by `r employed_gaps_yearly_change` per year from `r employed_start_year` to `r employed_end_year`
+
+- However, the gaps are worsening since 2017 by `r employed_gaps_yearly_change_2017 %>% round(1) %>% paste0("%")` per year.
+
+Column 2
+-----------------------------------------------------------------------
+
+
+### Comparisons
 
 ```{r}
-unemployment_rates_plot <- unemployment_summary_long %>%   
-  ggplot(aes(x = year, y = unemployed_prop, color = label)) +
-  geom_line() + 
-  geom_point() +
-  scale_x_continuous(breaks = scales::pretty_breaks()) +
-  scale_y_continuous(labels = scales::label_percent()) +
-  labs(color = NULL, x = NULL, y = NULL,
-       title = "Unemployment rate",
-       caption = "Data source: 5-year ACS") + 
-      scale_color_manual(values = wrk_pal()(3))
+# Create a long data frame for plotting
+employed_long <- employed_wide %>%
+  select(-contains("_gap_to_")) %>%
+  pivot_longer(cols = -year, names_to = "level", values_to = "prop_employed") %>% 
+  mutate(level = recode(level, "WRK" = "WRK Group Tracts"))
 
-# Convert to Plotly
-unemployment_rates_plot %>%
-  ggplotly()
+# Add color column for plotting
+employed_long <- employed_long %>%
+  mutate(plot_color = recode(level, 
+                             "WRK Group Tracts" = get_wrk_color("green"),
+                             "Delaware" = "grey",
+                             "Wilmington" = "grey",
+                             .default = get_wrk_color("green")))
+
+# Create a plot comparing three census tracts
+plot_ly(x = ~year, y = ~prop_employed) %>%
+  # Line for Wilmington
+  plotly_add_employed_ine(employed_long, 
+                          level = "Wilmington",
+                          dash = "dot") %>%
+  plotly_add_employed_ine(employed_long, 
+                          level = "Riverside",
+                          color = get_wrk_color("green"),
+                          force_annotation_position = "top") %>%
+  plotly_add_employed_ine(employed_long, 
+                          level = "Eastlake",
+                          color = get_wrk_color("blue_green", "secondary")) %>%
+  plotly_add_employed_ine(employed_long, 
+                          level = "Northeast",
+                          color = get_wrk_color("dark_green", "secondary")) %>% 
+  # Add title
+  add_title(text = "Employment rate across 3 census tracts served by the WRK Group") %>%
+  # Add source
+  plotly_caption_source("Census 5-year ACS",
+                        href = "https://www.census.gov/",
+                        y = -0.05) %>% 
+  # Format y-axis for percentages
+  layout(yaxis = list(tickformat = ",.0%")) %>%
+  # Hide axis labels
+  plotly_remove_axis_titles() %>%
+  plotly_hide_modebar() %>% 
+  hide_legend() %>%
+  # Hide vertical grid lines 
+  layout(xaxis = list(showgrid = FALSE)) %>% 
+  # Disable zoom
+  plotly_disable_zoom()
 ```
 
-### Notes {data-height=150}
-
-- The gaps to the Wilmington's unemployment rate were improving on average
-by `r unemployment_gaps_yearly_change` per year from `r unemployment_start_year` to `r unemployment_end_year`
-
-- However, the gaps are worsening since 2017 by `r unemployment_text` per year.
 
 
 # Events {data-orientation=columns}

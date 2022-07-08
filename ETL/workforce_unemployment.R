@@ -47,6 +47,10 @@ target_years <- 2011:current_year
 target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
                    "CT 6.01" = "10003000601",
                    "CT 6.02" = "10003000602")
+target_tracts_labels <- c("Riverside",
+                          "Eastlake",
+                          "Northeast")
+names(target_tracts_labels) <- target_tracts
 
 # Create a container table
 de_unemployment <- tibble("year" = target_years)
@@ -83,31 +87,32 @@ unemployment_summary_wilmington <- de_unemployment %>%
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
   mutate(label = "Wilmington")
 
-unemployment_summary_target_tracts <- de_unemployment %>%
+unemployment_summary_target_tracts_aggregate <- de_unemployment %>%
   filter(GEOID %in% target_tracts) %>%
   group_by(year) %>%
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
   mutate(label = "WRK")
 
-unemployment_summary_riverside <- de_unemployment %>%
-  filter(GEOID == "10003003002") %>%
-  group_by(year) %>%
+unemployment_summary_target_tracts <- de_unemployment %>%
+  filter(GEOID %in% target_tracts) %>%
+  group_by(year, GEOID) %>% 
   summarise(unemployed_prop = mean(unemployed_prop, na.rm = TRUE)) %>%
-  mutate(label = "Riverside")
+  mutate(label = recode(GEOID, !!!target_tracts_labels)) %>% 
+  select(-GEOID)
 
 # Long format
 unemployment_summary_long <- unemployment_summary_de %>%
   bind_rows(unemployment_summary_wilmington) %>%
-  bind_rows(unemployment_summary_target_tracts) %>%
-  bind_rows(unemployment_summary_riverside)
+  bind_rows(unemployment_summary_target_tracts_aggregate) %>%
+  bind_rows(unemployment_summary_target_tracts)
 
 # Wide format - each row is a year
 unemployment_summary_wide <- unemployment_summary_long %>%
   pivot_wider(names_from = label, values_from = unemployed_prop)
 # Calculate the gaps
 unemployment_summary_wide <- unemployment_summary_wide %>%
-  mutate(gap_to_Delaware = WRK - Delaware,
-         gap_to_Wilmington = WRK - Wilmington)
+  mutate(WRK_gap_to_Delaware = WRK - Delaware,
+         WRK_gap_to_Wilmington = WRK - Wilmington)
 
 # Save summary tables
 write_rds(unemployment_summary_long, here("data/processed/workforce_unemployment_sum_long.rds"))

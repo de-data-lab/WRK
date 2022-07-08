@@ -542,7 +542,7 @@ improved by `r gap_yearly_change_2016_txt` per year from 2016 to 2020.
 
 # Workforce Development {data-orientation=columns}
 
-Column 1: Unemployment
+Column 1: Employment
 -----------------------------------------------------------------------
 ```{r, workforce-setup}
 # Load Data
@@ -571,7 +571,7 @@ employed_gaps_yearly_change_2017 <- employed_gaps_lm_2017$coefficients["year"] *
 
 
 ```{r child='components/workforce_unemployment_valbox.Rmd'}
-# Unemployment gaps to Wilmington, since 2017
+# Employment gaps to Wilmington, since 2017
 ```
 
 

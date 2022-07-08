@@ -20,7 +20,7 @@ plotly_add_employed_ine <- function(p,
                                     color = "grey",
                                     dash = "solid",
                                     offset_y = 0,
-                                    offxet_x = 0.6,
+                                    offxet_x = 0.4,
                                     force_annotation_position = FALSE,
                                     font_size = 14) {
   
@@ -63,5 +63,7 @@ plotly_add_employed_ine <- function(p,
                           color = color,
                           x = latest_year + offxet_x,
                           y = annotation_y_position,
-                          size = font_size)
+                          size = font_size,
+                          align = "left",
+                          xanchor = "left")
 }

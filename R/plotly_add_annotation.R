@@ -1,8 +1,12 @@
 plotly_add_annotation <- function(p, text,
                                   x, y, color, 
-                                  size) {
+                                  size,
+                                  align = "center",
+                                  xanchor = "center") {
   p %>% 
     layout(annotations = list(
+      align = align,
+      xanchor = xanchor,
       x = x, 
       y = y, 
       text = text,

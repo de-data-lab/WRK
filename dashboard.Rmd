@@ -722,7 +722,9 @@ events_summary <- events_summary %>%
   mutate(pct_per_month = scales::label_percent()(prop_per_month))
 # Create the hovertext text to show for the plot
 events_summary <- events_summary %>%
-  mutate(hovertext = str_glue("In {month_abb}, {year}, {pct_per_month} of events were held at {location}"))
+  mutate(hovertext = str_glue(
+    "In {month_abb}, {year}, {pct_per_month} of events were held at {location}") %>%
+           str_wrap_hovertemplate())
 
 # Set colors for the plot
 locations <- events_summary$location %>% 

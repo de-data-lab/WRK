@@ -810,19 +810,38 @@ ggplotly(events_weekly_plot, tooltip = "text") %>%
 
 ### Top events
 ```{r}
-events_names_plot <- events_warehouse %>%
+top_events <- events_warehouse %>%
   group_by(year, top_events) %>%
-  summarise(sum_hour = sum(duration_hour, na.rm = TRUE)) %>%
-  ggplot(aes(x = year, y = sum_hour, fill = top_events)) + 
+  summarise(sum_hour = sum(duration_hour, na.rm = TRUE))
+
+# Add tooltip texts
+top_events <- top_events %>%
+  mutate(sum_hour_rounded = round(sum_hour, 1)) %>%
+  mutate(hovertext = str_glue("In {year}, The Warehouse spent {sum_hour_rounded} hours for the event, {top_events}") %>%
+           str_wrap_hovertemplate())
+
+# Create a plot
+top_events_plot <- top_events %>% 
+  ggplot(aes(x = year, y = sum_hour, fill = top_events,
+             text = hovertext)) + 
   geom_col() +
   scale_y_continuous(labels = ~paste0(., " hrs")) +
   labs(x = NULL,
        y = NULL,
        fill = "Top events",
-       title = "Events with most hours")
+       title = "Events with most hours") +
+  # Use WRK group pallete 
+    discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
+  # Remove grid lines 
+    theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
 
 # Render plot
-renderPlot({ events_names_plot }, res = 100)
+ggplotly(top_events_plot, tooltip = "text") %>% 
+    plotly_disable_zoom() %>%
+  plotly_hide_modebar() %>%
+    # Disable the click event for the legend 
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
 ```
 
 

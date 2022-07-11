@@ -116,6 +116,11 @@ num_locations <- 5
 # Create a new column "location" and store coded values 
 all_calendars_df <- all_calendars_df %>% 
   mutate(location = fct_lump_n(FacilityName, num_locations))
+# Replace missing values as "Other"
+all_calendars_df <- all_calendars_df %>% 
+  mutate(location = replace_na(location, "Other"))
+
+
 
 # TODO: Label the event types 
 

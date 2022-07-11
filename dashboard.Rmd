@@ -769,19 +769,31 @@ events_weekly_duration <- events_warehouse %>%
   summarise(weekly_sum = sum(duration_hour, na.rm = TRUE)) %>%
   mutate(year = year(week))
 
+# Prepare hover text
+events_weekly_duration <- events_weekly_duration %>%
+  mutate(week_label = format(week, "%b %e, %Y")) %>%
+  mutate(hovertext = str_glue("In the week of {week_label}, the Warehouse provided {weekly_sum} hours of events"))
+
 # Sum of serviced weekly hours over time
-weekly_duration_plot <- events_weekly_duration %>%
+events_weekly_plot <- events_weekly_duration %>%
   ggplot(aes(x = week, 
              y = weekly_sum, 
-             group = 1)) +
-  geom_line() + 
+             group = 1,
+             text = hovertext)) +
+  geom_line(color = get_wrk_color("green")) + 
   scale_y_continuous(labels = ~paste0(., " hrs")) +
+  scale_x_datetime(labels = scales::label_date("%b %Y")) + 
   labs(y = NULL,
        x = NULL,
-       title = "Sum of weekly event hours over time")
+       title = "Total event hours per week") + 
+  # Remove grid lines
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
 
 # Render the plot
-renderPlot({ weekly_duration_plot }, res = 90)
+ggplotly(events_weekly_plot, tooltip = "text") %>%
+  plotly_disable_zoom() %>%
+  plotly_hide_modebar()
 ```
 
 

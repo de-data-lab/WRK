@@ -708,19 +708,44 @@ Column 1: Number of events
 ### Number of events
 
 ```{r}
-# Plot Over time
-event_counts_plot <- events_warehouse %>%
-  ggplot(aes(x = month, fill = location)) +
-  geom_histogram(binwidth = 0.5) + 
+# Create a summary table
+events_summary <- events_warehouse %>% group_by(year, month, location) %>% count()
+# Add Month names
+events_summary <- events_summary %>%
+  mutate(month_abb = map_chr(month, ~month.abb[.]))
+# Calculate the proportions of events within a month
+events_summary <- events_summary %>%
+  group_by(year, month) %>% 
+  mutate(prop_per_month = n / sum(n))
+# Get the text for percentages
+events_summary <- events_summary %>%
+  mutate(pct_per_month = scales::label_percent()(prop_per_month))
+# Create the hovertext text to show for the plot
+events_summary <- events_summary %>%
+  mutate(hovertext = str_glue("In {month_abb}, {year}, {pct_per_month} of events were held at {location}"))
+
+# Create a ggplot
+event_counts_plot <- events_summary %>%
+  # Rename columns to render for ggplotly
+  ggplot(aes(x = month, 
+             fill = location, 
+             y = n,
+             text = hovertext)) +
+  geom_col() + 
   scale_x_continuous(labels = ~month.abb[.], breaks = 1:12) + 
-  facet_wrap(~year, ncol = 1) + 
+  facet_wrap(year ~ ., ncol = 1) +
   labs(x = NULL, y = NULL,
        title = "Number of Warehouse events over time",
        fill = "Top locations",
-       caption = "Source: The Warehouse Public Calendar ")
+       caption = "Source: The Warehouse Public Calendar ") +
+  # Remove gridlines
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
 
-# Render the plot
-renderPlot({ event_counts_plot }, res = 100)
+# Convert the ggplot to Plotly and render it
+ggplotly(event_counts_plot, tooltip = "text") %>% 
+  plotly_disable_zoom() %>%
+  plotly_hide_modebar()
 ```
 
 

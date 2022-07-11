@@ -85,7 +85,7 @@ riverside_total_units_pct_change_mean <- riverside_total_units %>%
 riverside_total_units_lm <- riverside_total_units %>%
   lm(data = ., total_units ~ year)
 riverside_total_units_coef <- coef(riverside_total_units_lm)[["year"]]
-  
+
 ## Proportions of units occupied 
 # Calculate the Riverside metrics
 riverside_pct_occupied <- hud_de %>%
@@ -327,7 +327,7 @@ plot_ly(x = ~year,
   plotly_hide_modebar() %>%
   # Add caption 
   plotly_caption_hud()
-  
+
 ```
 
 
@@ -368,7 +368,7 @@ graduation_gaps <- read_rds(here("data/processed/education_graduation_gaps.rds")
 # Calculate statics for graduation
 # Graduation: Assume linear trend and calculate an average change
 graduation_gaps_lm <- lm(data = graduation_gaps,
-   formula  = gap ~ schoolyear)
+                         formula  = gap ~ schoolyear)
 
 gap_yearly_change <- graduation_gaps_lm$coefficients["schoolyear"] %>%
   sprintf("%.2f%%", .)
@@ -379,12 +379,12 @@ end_year <-  graduation_gaps_lm$model$schoolyear %>% max()
 graduation_gaps_lm_2016 <- graduation_gaps %>% 
   filter(schoolyear >= 2016) %>%
   lm(data = .,
-   formula  = gap ~ schoolyear)
+     formula  = gap ~ schoolyear)
 gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"]
 
 gap_yearly_change_2016_txt <- gap_yearly_change_2016 %>%
   sprintf("%.2f%%", .)
-  
+
 ```
 
 
@@ -468,7 +468,7 @@ ELA_direction_text <-
 - In `r ELA_latest$schoolyear`, `r ELA_latest$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the literacy proficiency. 
 
 - The gap to the Delaware average (`r ELA_latest$delaware`%) was `r ELA_latest$gap`%. The gap has been `r ELA_direction_text` by `r eastside_ELA_gap_coeff %>% round(1)`% a year.
- 
+
 Column 3: Math
 -----------------------------------------------------------------------
 
@@ -872,8 +872,8 @@ Inputs {.sidebar}
 selectInput("selectedOutcome", label = NULL, 
             choices = hud_vars)
 renderText({
-    hud_var_def[[input$selectedOutcome]]
-  })
+  hud_var_def[[input$selectedOutcome]]
+})
 ```
 
 
@@ -897,7 +897,7 @@ Row 1
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     plot_bar(outcome = input$selectedOutcome,
              method = input$summaryMethod,
@@ -913,7 +913,7 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code %in% target_tracts) %>%
     plot_bar(outcome = input$selectedOutcome,
@@ -934,7 +934,7 @@ Row 2
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003003002") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
@@ -951,7 +951,7 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003000601") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
@@ -968,13 +968,13 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003000602") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
-   geom_plot_col +
+    geom_plot_col +
     ylab(names(which(hud_vars == input$selectedOutcome)))
-
+  
   
 })
 ```
@@ -1015,12 +1015,12 @@ selectInput(
   inputId = "ach_grades",
   label = "Grades",
   choices = c("3rd Grade",
-    "4th Grade",
-    "5th Grade",
-    "6th Grade",
-    "7th Grade",
-    "8th Grade",
-    "All Students"),
+              "4th Grade",
+              "5th Grade",
+              "6th Grade",
+              "7th Grade",
+              "8th Grade",
+              "All Students"),
   multiple = TRUE,
   selected = "All Students"
 )
@@ -1072,7 +1072,7 @@ output$graduation <- renderPlotly({
     labs(color = NULL) + 
     ggtitle("High school graduation rate")
   
-    return(ggplotly(out_plot))
+  return(ggplotly(out_plot))
 })
 
 plotlyOutput("graduation")

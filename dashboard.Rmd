@@ -783,7 +783,8 @@ events_weekly_duration <- events_warehouse %>%
 # Prepare hover text
 events_weekly_duration <- events_weekly_duration %>%
   mutate(week_label = format(week, "%b %e, %Y")) %>%
-  mutate(hovertext = str_glue("In the week of {week_label}, the Warehouse provided {weekly_sum} hours of events"))
+  mutate(hovertext = str_glue("In the week of {week_label}, The Warehouse provided {weekly_sum} hours of events") %>% 
+           str_wrap_hovertemplate())
 
 # Sum of serviced weekly hours over time
 events_weekly_plot <- events_weekly_duration %>%

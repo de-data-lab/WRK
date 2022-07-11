@@ -744,7 +744,7 @@ event_counts_plot <- events_summary %>%
   scale_x_continuous(labels = ~month.abb[.], breaks = 1:12) + 
   facet_wrap(year ~ ., ncol = 1) +
   labs(x = NULL, y = NULL,
-       title = "Number of Warehouse events over time",
+       title = "Number of The Warehouse events over time",
        fill = "Top locations",
        caption = "Source: The Warehouse Public Calendar ") +
   scale_fill_manual(values = locations_pal) +

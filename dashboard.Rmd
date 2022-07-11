@@ -85,7 +85,7 @@ riverside_total_units_pct_change_mean <- riverside_total_units %>%
 riverside_total_units_lm <- riverside_total_units %>%
   lm(data = ., total_units ~ year)
 riverside_total_units_coef <- coef(riverside_total_units_lm)[["year"]]
-  
+
 ## Proportions of units occupied 
 # Calculate the Riverside metrics
 riverside_pct_occupied <- hud_de %>%
@@ -327,7 +327,7 @@ plot_ly(x = ~year,
   plotly_hide_modebar() %>%
   # Add caption 
   plotly_caption_hud()
-  
+
 ```
 
 
@@ -368,7 +368,7 @@ graduation_gaps <- read_rds(here("data/processed/education_graduation_gaps.rds")
 # Calculate statics for graduation
 # Graduation: Assume linear trend and calculate an average change
 graduation_gaps_lm <- lm(data = graduation_gaps,
-   formula  = gap ~ schoolyear)
+                         formula  = gap ~ schoolyear)
 
 gap_yearly_change <- graduation_gaps_lm$coefficients["schoolyear"] %>%
   sprintf("%.2f%%", .)
@@ -379,12 +379,12 @@ end_year <-  graduation_gaps_lm$model$schoolyear %>% max()
 graduation_gaps_lm_2016 <- graduation_gaps %>% 
   filter(schoolyear >= 2016) %>%
   lm(data = .,
-   formula  = gap ~ schoolyear)
+     formula  = gap ~ schoolyear)
 gap_yearly_change_2016 <- graduation_gaps_lm_2016$coefficients["schoolyear"]
 
 gap_yearly_change_2016_txt <- gap_yearly_change_2016 %>%
   sprintf("%.2f%%", .)
-  
+
 ```
 
 
@@ -468,7 +468,7 @@ ELA_direction_text <-
 - In `r ELA_latest$schoolyear`, `r ELA_latest$east_side`% of the 3rd-8th graders at East Side Charter in Riverside achieved the literacy proficiency. 
 
 - The gap to the Delaware average (`r ELA_latest$delaware`%) was `r ELA_latest$gap`%. The gap has been `r ELA_direction_text` by `r eastside_ELA_gap_coeff %>% round(1)`% a year.
- 
+
 Column 3: Math
 -----------------------------------------------------------------------
 
@@ -708,19 +708,60 @@ Column 1: Number of events
 ### Number of events
 
 ```{r}
-# Plot Over time
-event_counts_plot <- events_warehouse %>%
-  ggplot(aes(x = month, fill = location)) +
-  geom_histogram(binwidth = 0.5) + 
-  scale_x_continuous(labels = ~month.abb[.], breaks = 1:12) + 
-  facet_wrap(~year, ncol = 1) + 
-  labs(x = NULL, y = NULL,
-       title = "Number of Warehouse events over time",
-       fill = "Top locations",
-       caption = "Source: The Warehouse Public Calendar ")
+# Create a summary table
+events_summary <- events_warehouse %>% group_by(year, month, location) %>% count()
+# Add Month names
+events_summary <- events_summary %>%
+  mutate(month_abb = map_chr(month, ~month.abb[.]))
+# Calculate the proportions of events within a month
+events_summary <- events_summary %>%
+  group_by(year, month) %>% 
+  mutate(events_per_month = sum(n)) %>%
+  mutate(prop_per_month = n / events_per_month)
+# Get the text for percentages
+events_summary <- events_summary %>%
+  mutate(pct_per_month = scales::label_percent()(prop_per_month))
+# Create the hovertext text to show for the plot
+events_summary <- events_summary %>%
+  mutate(hovertext = str_glue(
+    "In {month_abb} {year}, {pct_per_month} of events were held at {location} ({n} out of {events_per_month} events)") %>%
+           str_wrap_hovertemplate())
 
-# Render the plot
-renderPlot({ event_counts_plot }, res = 100)
+# Set colors for the plot
+locations <- events_summary$location %>% 
+  unique() %>% 
+  sort()
+n_locations <- locations %>% length()
+locations_pal <- c(wrk_pal()(n_locations - 1), "grey")
+names(locations_pal) <- locations
+
+
+# Create a ggplot
+event_counts_plot <- events_summary %>%
+  # Rename columns to render for ggplotly
+  ggplot(aes(x = month, 
+             fill = location, 
+             y = n,
+             text = hovertext)) +
+  geom_col() + 
+  scale_x_continuous(labels = ~month.abb[.], breaks = 1:12) + 
+  facet_wrap(year ~ ., ncol = 1) +
+  labs(x = NULL, y = NULL,
+       title = "Number of The Warehouse events over time",
+       fill = "Top locations",
+       caption = "Source: The Warehouse Public Calendar ") +
+  scale_fill_manual(values = locations_pal) +
+  # discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
+  # Remove gridlines
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
+
+# Convert the ggplot to Plotly and render it
+ggplotly(event_counts_plot, tooltip = "text") %>% 
+  plotly_disable_zoom() %>%
+  plotly_hide_modebar() %>%
+  # Disable the click event for the legend 
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
 ```
 
 
@@ -742,37 +783,69 @@ events_weekly_duration <- events_warehouse %>%
   summarise(weekly_sum = sum(duration_hour, na.rm = TRUE)) %>%
   mutate(year = year(week))
 
+# Prepare hover text
+events_weekly_duration <- events_weekly_duration %>%
+  mutate(week_label = format(week, "%b %e, %Y")) %>%
+  mutate(hovertext = str_glue("In the week of {week_label}, The Warehouse provided {weekly_sum} hours of events") %>% 
+           str_wrap_hovertemplate())
+
 # Sum of serviced weekly hours over time
-weekly_duration_plot <- events_weekly_duration %>%
+events_weekly_plot <- events_weekly_duration %>%
   ggplot(aes(x = week, 
              y = weekly_sum, 
-             group = 1)) +
-  geom_line() + 
+             group = 1,
+             text = hovertext)) +
+  geom_line(color = get_wrk_color("green")) + 
   scale_y_continuous(labels = ~paste0(., " hrs")) +
+  scale_x_datetime(labels = scales::label_date("%b %Y")) + 
   labs(y = NULL,
        x = NULL,
-       title = "Sum of weekly event hours over time")
+       title = "Total event hours per week") + 
+  # Remove grid lines
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
 
 # Render the plot
-renderPlot({ weekly_duration_plot }, res = 90)
+ggplotly(events_weekly_plot, tooltip = "text") %>%
+  plotly_disable_zoom() %>%
+  plotly_hide_modebar()
 ```
 
 
 ### Top events
 ```{r}
-events_names_plot <- events_warehouse %>%
+top_events <- events_warehouse %>%
   group_by(year, top_events) %>%
-  summarise(sum_hour = sum(duration_hour, na.rm = TRUE)) %>%
-  ggplot(aes(x = year, y = sum_hour, fill = top_events)) + 
+  summarise(sum_hour = sum(duration_hour, na.rm = TRUE))
+
+# Add tooltip texts
+top_events <- top_events %>%
+  mutate(sum_hour_rounded = round(sum_hour, 1)) %>%
+  mutate(hovertext = str_glue("In {year}, The Warehouse spent {sum_hour_rounded} hours for the event, {top_events}") %>%
+           str_wrap_hovertemplate())
+
+# Create a plot
+top_events_plot <- top_events %>% 
+  ggplot(aes(x = year, y = sum_hour, fill = top_events,
+             text = hovertext)) + 
   geom_col() +
   scale_y_continuous(labels = ~paste0(., " hrs")) +
   labs(x = NULL,
        y = NULL,
        fill = "Top events",
-       title = "Events with most hours")
+       title = "Events with most hours") +
+  # Use WRK group pallete 
+    discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
+  # Remove grid lines 
+    theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank())
 
 # Render plot
-renderPlot({ events_names_plot }, res = 100)
+ggplotly(top_events_plot, tooltip = "text") %>% 
+    plotly_disable_zoom() %>%
+  plotly_hide_modebar() %>%
+    # Disable the click event for the legend 
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
 ```
 
 
@@ -800,8 +873,8 @@ Inputs {.sidebar}
 selectInput("selectedOutcome", label = NULL, 
             choices = hud_vars)
 renderText({
-    hud_var_def[[input$selectedOutcome]]
-  })
+  hud_var_def[[input$selectedOutcome]]
+})
 ```
 
 
@@ -825,7 +898,7 @@ Row 1
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     plot_bar(outcome = input$selectedOutcome,
              method = input$summaryMethod,
@@ -841,7 +914,7 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code %in% target_tracts) %>%
     plot_bar(outcome = input$selectedOutcome,
@@ -862,7 +935,7 @@ Row 2
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003003002") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
@@ -879,7 +952,7 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003000601") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
@@ -896,13 +969,13 @@ renderPlot({
 renderPlot({
   
   selectedOutcome <- sym(input$selectedOutcome)
-
+  
   hud_de %>%
     filter(code == "10003000602") %>%
     ggplot(aes(x = year, y = !!selectedOutcome)) +
-   geom_plot_col +
+    geom_plot_col +
     ylab(names(which(hud_vars == input$selectedOutcome)))
-
+  
   
 })
 ```
@@ -943,12 +1016,12 @@ selectInput(
   inputId = "ach_grades",
   label = "Grades",
   choices = c("3rd Grade",
-    "4th Grade",
-    "5th Grade",
-    "6th Grade",
-    "7th Grade",
-    "8th Grade",
-    "All Students"),
+              "4th Grade",
+              "5th Grade",
+              "6th Grade",
+              "7th Grade",
+              "8th Grade",
+              "All Students"),
   multiple = TRUE,
   selected = "All Students"
 )
@@ -1000,7 +1073,7 @@ output$graduation <- renderPlotly({
     labs(color = NULL) + 
     ggtitle("High school graduation rate")
   
-    return(ggplotly(out_plot))
+  return(ggplotly(out_plot))
 })
 
 plotlyOutput("graduation")

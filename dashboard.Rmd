@@ -747,7 +747,7 @@ ggplotly(event_counts_plot, tooltip = "text") %>%
   plotly_disable_zoom() %>%
   plotly_hide_modebar() %>%
   # Disable the click event for the legend 
-  layout(legend = list(itemclick = FALSE))
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
 ```
 
 

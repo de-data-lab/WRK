@@ -745,7 +745,9 @@ event_counts_plot <- events_summary %>%
 # Convert the ggplot to Plotly and render it
 ggplotly(event_counts_plot, tooltip = "text") %>% 
   plotly_disable_zoom() %>%
-  plotly_hide_modebar()
+  plotly_hide_modebar() %>%
+  # Disable the click event for the legend 
+  layout(legend = list(itemclick = FALSE))
 ```
 
 

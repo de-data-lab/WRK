@@ -724,6 +724,15 @@ events_summary <- events_summary %>%
 events_summary <- events_summary %>%
   mutate(hovertext = str_glue("In {month_abb}, {year}, {pct_per_month} of events were held at {location}"))
 
+# Set colors for the plot
+locations <- events_summary$location %>% 
+  unique() %>% 
+  sort()
+n_locations <- locations %>% length()
+locations_pal <- c(wrk_pal()(n_locations - 1), "grey")
+names(locations_pal) <- locations
+
+
 # Create a ggplot
 event_counts_plot <- events_summary %>%
   # Rename columns to render for ggplotly
@@ -738,6 +747,8 @@ event_counts_plot <- events_summary %>%
        title = "Number of Warehouse events over time",
        fill = "Top locations",
        caption = "Source: The Warehouse Public Calendar ") +
+  scale_fill_manual(values = locations_pal) +
+  # discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
   # Remove gridlines
   theme(panel.grid.minor = element_blank(),
         panel.grid.major.x = element_blank())

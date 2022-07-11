@@ -723,7 +723,7 @@ events_summary <- events_summary %>%
 # Create the hovertext text to show for the plot
 events_summary <- events_summary %>%
   mutate(hovertext = str_glue(
-    "In {month_abb}, {year}, {pct_per_month} of events were held at {location}") %>%
+    "In {month_abb} {year}, {pct_per_month} of events were held at {location}") %>%
            str_wrap_hovertemplate())
 
 # Set colors for the plot

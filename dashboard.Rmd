@@ -766,10 +766,14 @@ Column 2
 What are the top three safety concerns in Northeast Wilmington?
 
 ```{r}
-# Creat ea hover text
-concerns_template <- "%{x:,.1%} of participants reported %{y} as one of their top three safety concerns" %>%
+# Create a hover text
+concerns_template <- "%{x:,.1%} of participants reported %{meta} as one of their top three safety concerns" %>%
   str_wrap_hovertemplate(width = 30) %>%
   paste0("<extra></extra>")
+
+# Lowercase the variable labels
+safety_concerns <- safety_concerns %>%
+  mutate(var_label_lower = str_to_lower(var_label))
 
 # Plot
 safety_concerns %>%
@@ -777,6 +781,7 @@ safety_concerns %>%
   plot_ly() %>%
   add_bars(x = ~prop,
            y = ~var_label %>% str_wrap(35),
+           meta = ~var_label_lower %>% str_wrap(35),
            width = 0.5,
            color = I(get_wrk_color("green")),
            hovertemplate = concerns_template) %>%

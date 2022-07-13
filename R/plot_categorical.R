@@ -14,7 +14,9 @@
 plot_categorical <- function(.data, question, question_label = NULL,
                              include_annotation = TRUE,
                              hovertext_template = NULL,
-                             cateogry_label_ypos = 1) {
+                             annotation_ypos = 0.4,
+                             barwidth = 0.5,
+                             annotation_yref = "y") {
   
   if(!is.null(hovertext_template)) {
     hovertext_template <- hovertext_template %>% 
@@ -44,7 +46,7 @@ plot_categorical <- function(.data, question, question_label = NULL,
              insidetextanchor = "middle",
              textfont = list(color = "white"),
              textposition = "inside",
-             width = 0.5,
+             width = barwidth,
              hovertemplate = hovertext_template,
              textangle = 0,
              # Use WRK color 
@@ -55,9 +57,9 @@ plot_categorical <- function(.data, question, question_label = NULL,
       add_annotations(., data = filtered_data,
                       text = ~response %>% str_wrap(5),
                       x = ~prop_cumsum,
-                      y = cateogry_label_ypos,
-                      showarrow = FALSE,
-                      yref = "paper")
+                      y = annotation_ypos,
+                      yref = annotation_yref,
+                      showarrow = FALSE)
     } else .} %>% 
     layout(barmode = "stack") %>%
     hide_guides() %>%

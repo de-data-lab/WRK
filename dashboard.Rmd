@@ -732,16 +732,18 @@ render_safety_valbox(categoricals_prop,
 # Create the community safety subplot
 community_safety <- plot_categorical(categoricals_prop, question = "community_safety",
                                      question_label = "",
-                                     hovertext_template = "%{x:,.1%} of participants rated the safety of the community as %{meta}",
-                                     cateogry_label_ypos = 0.9)
+                                     hovertext_template = "%{x:,.1%} of participants rated the safety of the community as %{meta}")
 feel_safe_day_plot <- plot_categorical(categoricals_prop,
                                        question_label = "During the day time",
                                        question = "feel_safe_day",
-                                       hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig during the day time")
+                                       hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig during the day time",
+                                       barwidth = 1,
+                                       annotation_ypos = 0.8)
 feel_safe_night_plot <- plot_categorical(categoricals_prop, question = "feel_safe_night",
                                          question_label = "At night",
+                                         hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig at night",
                                          include_annotation = FALSE,
-                                         hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig at night")
+                                         barwidth = 0.7)
 community_safety %>%
   add_title("How would you rate the safety in the community?") %>%
   # Add caption

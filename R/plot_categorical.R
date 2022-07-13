@@ -14,7 +14,7 @@
 plot_categorical <- function(.data, question, question_label = NULL,
                              include_annotation = TRUE,
                              hovertext_template = NULL,
-                             annotation_ypos = 0.4,
+                             annotation_ypos = 0.35,
                              barwidth = 0.5,
                              annotation_yref = "y") {
   

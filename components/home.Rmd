@@ -84,7 +84,30 @@ Column 2 {data-height=500}
 
 [Safety]{.h1 .fw-bolder}
 
-TBD
+::::: {.d-flex}
+
+### day
+```{r}
+
+render_safety_valbox(categoricals_prop,
+                     color = "primary",
+                     icon = "fa-sun-o")
+```
+
+### night
+
+```{r}
+render_safety_valbox(categoricals_prop,
+                     question = "feel_safe_night",
+                     caption = "survey participants reported feeling safe while walking at night",
+                     color = "warning",
+                     icon = "fa-moon-o")
+```
+
+:::::
+
+
+
 
 ::::
 

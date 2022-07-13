@@ -49,8 +49,6 @@ clearn_variable_labels <- recode_named_list %>%
 # Assumes that the order did not change
 names(clearn_variable_labels) <- names(recode_named_list)
 
-# Label the variables using {labelled}
-survey_df <- set_variable_labels(survey_df, !!!clearn_variable_labels)
 
 # Convert to factors and set factor levels
 ## Re-code community safety levels
@@ -81,6 +79,10 @@ vars_to_logical <- c("printz_public_safety",
                      "safety_concerns_drinking", "safety_concerns_traffic", "future_safe_stable")
 # Note: I'm not sure if NA's are representing true missing data or "No" response
 # Converting to a logical vector is not suitable because we cannot document missingness here
+
+
+# Label the variables using {labelled}
+survey_df <- set_variable_labels(survey_df, !!!clearn_variable_labels)
 
 
 # Extract Safety-Related Variables  ------------------------------
@@ -117,8 +119,10 @@ categorical_summary_df <- tibble(question = categorical_variables)
 count_by_variable <- function(x){
   # Use `ensym` to get unquoted 
   current_variable_ensym <- ensym(x)
+  cur_var_label <- safety_df %>% pull(!!current_variable_ensym) %>% var_label()
   safety_df %>% 
-    count(!!current_variable_ensym)
+    count(response = !!current_variable_ensym) %>%
+    mutate(var_label = cur_var_label)
 }
 
 categorical_summary_df <- categorical_summary_df %>%
@@ -128,6 +132,9 @@ community_safety_summary <- safety_df %>%
   count(community_safety)
 
 # For the "yes" questions, get the number of yes
+yes_questions_var_labels <- safety_df %>%
+  select(vars_to_logical) %>%
+  var_label()
 yes_questions_summary <- safety_df %>% 
   select(vars_to_logical) %>%
   pivot_longer(everything(),
@@ -135,7 +142,12 @@ yes_questions_summary <- safety_df %>%
   mutate(value = case_when(value == "Yes" ~ 1,
                            TRUE ~ 0)) %>%
   group_by(question) %>%
-  summarise(total_count = sum(value))
+  summarise(yes = sum(value),
+            total_participants = nrow(cur_data()))
+
+# Add var labels
+yes_questions_summary <- yes_questions_summary %>%
+  mutate(var_label = recode(question, !!!yes_questions_var_labels))
 
 # Save the summary data object
 ## Bundle summaries as a list of tables

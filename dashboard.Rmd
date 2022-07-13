@@ -42,6 +42,9 @@ source(here("R/plotly_caption_source.R"))
 # Workforce Development
 source(here("R/render_employment.R"))
 source(here("R/plotly_add_employed_line.R"))
+# Safety
+source(here("R/plot_categorical.R"))
+source(here("R/render_safety_valbox.R"))
 
 
 ## Load HUD Data 
@@ -57,7 +60,7 @@ theme_set(theme_minimal())
 ```
 
 # Home {data-orientation=rows}
-```{r, ref.label=c("housing-setup", "education-setup", "literacy-setup", "math-setup", "graduation-setup", "workforce-setup", "events-setup")}
+```{r, ref.label=c("housing-setup", "education-setup", "literacy-setup", "math-setup", "graduation-setup", "workforce-setup", "safety-setup", "events-setup")}
 # Run the code chunks ahead to render the home component
 ```
 
@@ -670,6 +673,136 @@ plot_ly(x = ~year, y = ~prop_employed) %>%
   plotly_disable_zoom()
 ```
 
+# Safety {data-orientation=columns}
+```{r, safety-setup}
+# Load the survey data
+safety_survey <- read_rds(here("data/processed/safety_WRK_survey_2021.rds"))
+# Get categoricals and unnest
+categoricals <- safety_survey$categoricals %>% 
+  unnest(cols = c(summary_df))
+# Get proportions within question
+categoricals_prop <- categoricals %>% 
+  group_by(question) %>% 
+  drop_na(response) %>%
+  mutate(prop = n / sum(n))
+# Yes-no questions about points of concerns
+yes_questions <- safety_survey$yes_questions
+# Get proportions
+yes_questions <- yes_questions %>%
+  mutate(prop = yes / total_participants)
+# Get safety concerns questsions only
+safety_concerns <- yes_questions %>%
+  filter(str_starts(question, "safety_concerns_"))
+
+# Calculate the cumulative sum to determine the label positions
+categoricals_prop <- categoricals_prop %>% 
+  mutate(prop_cumsum = cumsum(prop) - (prop)/2)
+
+```
+
+Column 1
+-----------------------------------------------------------------------
+
+::::: {.d-flex}
+
+### Day
+```{r}
+
+render_safety_valbox(categoricals_prop,
+                     color = "primary",
+                     icon = "fa-sun-o")
+```
+
+### Night
+
+```{r}
+render_safety_valbox(categoricals_prop,
+                     question = "feel_safe_night",
+                     caption = "survey participants reported feeling safe while walking at night",
+                     color = "warning",
+                     icon = "fa-moon-o")
+```
+
+:::::
+
+
+### Safety rating
+```{r}
+
+# Create the community safety subplot
+community_safety <- plot_categorical(categoricals_prop, question = "community_safety",
+                                     question_label = "",
+                                     hovertext_template = "%{x:,.1%} of participants rated the safety of the community as %{meta}")
+feel_safe_day_plot <- plot_categorical(categoricals_prop,
+                                       question_label = "During the day time",
+                                       question = "feel_safe_day",
+                                       hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig during the day time",
+                                       barwidth = 1,
+                                       annotation_ypos = 0.8)
+feel_safe_night_plot <- plot_categorical(categoricals_prop, question = "feel_safe_night",
+                                         question_label = "At night",
+                                         hovertext_template = "%{x:,.1%} of participants reported feeling %{meta} when walkinig at night",
+                                         include_annotation = FALSE,
+                                         barwidth = 0.7)
+community_safety %>%
+  add_title("How would you rate the safety in the community?") %>%
+  # Add caption
+  plotly_caption_source("2020 Resident Survey")
+```
+
+### Walking
+```{r}
+subplot(feel_safe_day_plot,
+        feel_safe_night_plot,
+        nrows = 2, margin = 0) %>%
+  add_title("How safe would you say you feel walking in the community?") %>%
+  # Add caption
+  plotly_caption_source("2020 Resident Survey")
+```
+
+Column 2
+-----------------------------------------------------------------------
+
+### Safety concerns
+
+What are the top three safety concerns in Northeast Wilmington?
+
+```{r}
+# Create a hover text
+concerns_template <- "%{x:,.1%} of participants reported %{meta} as one of their top three safety concerns" %>%
+  str_wrap_hovertemplate(width = 30) %>%
+  paste0("<extra></extra>")
+
+# Lowercase the variable labels
+safety_concerns <- safety_concerns %>%
+  mutate(var_label_lower = str_to_lower(var_label))
+
+# Plot
+safety_concerns %>%
+  arrange(prop) %>%
+  plot_ly() %>%
+  add_bars(x = ~prop,
+           y = ~var_label %>% str_wrap(35),
+           meta = ~var_label_lower %>% str_wrap(35),
+           width = 0.5,
+           color = I(get_wrk_color("green")),
+           hovertemplate = concerns_template) %>%
+  layout(xaxis = list(zerolinecolor = "grey")) %>%
+  # Add padding to the labels to the vertical line
+  layout(margin = list(pad = 10)) %>%
+  # Order bar
+  layout(yaxis = list(categoryorder = "mean ascending")) %>%
+  # Top 
+  # Order bar
+  layout(xaxis = list(side = "top")) %>%
+  # Ticks to percent
+  layout(xaxis = list(tickformat = ",.0%")) %>%
+  plotly_hide_modebar() %>%
+  plotly_disable_zoom() %>%
+  plotly_remove_axis_titles() %>%
+  # Add caption
+  plotly_caption_source("2020 Resident Survey", y = 0)
+```
 
 
 # Events {data-orientation=columns}
@@ -725,7 +858,7 @@ events_summary <- events_summary %>%
 events_summary <- events_summary %>%
   mutate(hovertext = str_glue(
     "In {month_abb} {year}, {pct_per_month} of events were held at {location} ({n} out of {events_per_month} events)") %>%
-           str_wrap_hovertemplate())
+      str_wrap_hovertemplate())
 
 # Set colors for the plot
 locations <- events_summary$location %>% 
@@ -835,16 +968,16 @@ top_events_plot <- top_events %>%
        fill = "Top events",
        title = "Events with most hours") +
   # Use WRK group pallete 
-    discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
+  discrete_scale("fill", paste0("wrk_", "main"), palette = wrk_pal()) +
   # Remove grid lines 
-    theme(panel.grid.minor = element_blank(),
+  theme(panel.grid.minor = element_blank(),
         panel.grid.major.x = element_blank())
 
 # Render plot
 ggplotly(top_events_plot, tooltip = "text") %>% 
-    plotly_disable_zoom() %>%
+  plotly_disable_zoom() %>%
   plotly_hide_modebar() %>%
-    # Disable the click event for the legend 
+  # Disable the click event for the legend 
   layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
 ```
 

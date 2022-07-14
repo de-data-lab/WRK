@@ -9,6 +9,7 @@ output:
       primary: "#0c8ccd" #blue
       warning: "#ffc934" #yellow
       navbar-bg: "#00a454" #green
+    logo: "inst/www/logo_40.png"
 runtime: shiny
 ---
 
@@ -1214,6 +1215,11 @@ output$graduation <- renderPlotly({
 plotlyOutput("graduation")
 ```
 
+
+```{r}
+# Add JavaScript
+tags$script(src = "inst/www/script.js")
+```
 
 
 <!-- Markdown Links -->

@@ -329,7 +329,9 @@ plot_ly(x = ~year,
   # Hide the mode bar
   plotly_hide_modebar() %>%
   # Add caption 
-  plotly_caption_hud()
+  plotly_caption_hud() %>% 
+  # Remove the horizontal grid lines
+  layout(xaxis = list(showgrid = FALSE))
 
 ```
 

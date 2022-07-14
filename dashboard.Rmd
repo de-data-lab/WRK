@@ -1216,6 +1216,11 @@ plotlyOutput("graduation")
 ```
 
 
+```{r}
+# Add JavaScript
+tags$script(src = "inst/www/script.js")
+```
+
 
 <!-- Markdown Links -->
 

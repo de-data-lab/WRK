@@ -14,7 +14,7 @@ render_employment <- function(.data, level = "WRK", compare_to = "Wilmington") {
   level_annotation <- level
   if (level == "WRK"){
     level_label <- "the 3 census tracts served by the WRK group"
-    level_annotation <- "Riverside, \nEastlawn, \n& Northeast"
+    level_annotation <- "Riverside, \nEastlake, \n& Northeast"
   }
   
   gap_variable <- str_glue("{level}_gap_to_{compare_to}")

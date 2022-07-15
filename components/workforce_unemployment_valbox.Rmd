@@ -1,4 +1,4 @@
-### Change in employment gaps to Wilmington since 2017
+### Change in employment rate in WRK Group's census tracts compared to Wilmington since 2017
 
 ```{r}
 employed_box_color <- case_when(employed_gaps_yearly_change_2017 <= 0 ~ "warning",

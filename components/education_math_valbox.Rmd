@@ -3,6 +3,6 @@
 ```{r}
 # Create a value box for math gap
 eastside_math_gap_coeff %>%
-  sprintf("%+.1f%%/year", .) %>%
+  sprintf("%+.1f%% per year", .) %>%
   valueBox(icon = "fas fa-calculator")
 ```

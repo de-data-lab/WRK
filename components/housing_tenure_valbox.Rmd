@@ -13,7 +13,7 @@ riverside_tenure_coef <- coef(riverside_tenure_lm)[["year"]]
 
 riverside_tenure_text <- riverside_tenure_coef %>%
   round(1) %>%
-  sprintf("%+.1fmo/year", .)
+  sprintf("%+.1f months per year", .)
 
 valueBox(riverside_tenure_text, icon = "fas fa-calendar-alt")
 ```

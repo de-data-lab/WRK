@@ -7,7 +7,7 @@ unemployment_text <- employed_gaps_yearly_change_2017 %>%
   sprintf(fmt = "%+.1f%%", .)
 
 unemployment_text %>%  
-  paste0("/year") %>%
+  paste0(" per year") %>%
   valueBox(icon = "fa-briefcase",
            color = employed_box_color)
 ```

@@ -3,6 +3,6 @@
 ```{r}
 # Render value box
 eastside_ELA_gap_coeff %>%
-  sprintf("%+.1f%%/year", .) %>%
+  sprintf("%+.1f%% per year", .) %>%
   valueBox(icon = "fa-book-open")
 ```

@@ -8,7 +8,6 @@ output:
       version: 4
       primary: "#49da93" #green
       warning: "#47adbb" #blue
-      warning-fg: "gray"
       navbar-bg: "#00a454" #green
     navbar:
       - {icon: "fa-github", href: "https://github.com/de-data-lab/WRK", target: "_blank"}

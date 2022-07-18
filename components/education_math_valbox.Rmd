@@ -1,4 +1,4 @@
-### Improvement in math achievement gap to Delaware {data-height=100}
+### Improvement in math achievement gap to Delaware {data-height=100 `r valbox_style`}
 
 ```{r}
 # Create a value box for math gap

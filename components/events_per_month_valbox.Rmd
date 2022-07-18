@@ -1,4 +1,4 @@
-### average events hosted
+### average events hosted {`r valbox_style`}
 
 ```{r}
 events_monthly_count %>% 

@@ -1,4 +1,4 @@
-### service provided to the community
+### service provided to the community {`r valbox_style`}
 
 ```{r}
 events_yearly_hours %>% 

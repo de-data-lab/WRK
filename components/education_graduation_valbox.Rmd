@@ -2,6 +2,6 @@
 
 ```{r}
 gap_yearly_change_2016 %>%
-  sprintf("%+.1f%%/year", .) %>%
+  sprintf("%+.1f%% per year", .) %>%
   valueBox(icon = "fa-graduation-cap")
 ```

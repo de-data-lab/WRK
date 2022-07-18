@@ -3,6 +3,6 @@
 ```{r}
 events_monthly_count %>% 
   round(1) %>%
-  paste0(" events/month") %>%
+  paste0(" events per month") %>%
   valueBox(icon = "fa-calendar-plus")
 ```

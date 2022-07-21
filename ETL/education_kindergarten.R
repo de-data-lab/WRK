@@ -18,10 +18,6 @@ kinder_readiness_DE <- kinder_readiness_DE %>%
   mutate(Data = as.numeric(Data)) %>%
   mutate(TimeFrame = as.numeric(TimeFrame))
 
-# Save the file 
-write_rds(kinder_readiness_DE, here("data/processed/", "education_kinder_readiness_long.rds"))
-
-
 # Convert the file to a wide format (one row represents a year)
 kinder_readiness_DE_wide <- kinder_readiness_DE %>%
   pivot_wider(names_from = `Assessment area`, values_from = Data)

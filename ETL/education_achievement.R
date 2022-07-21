@@ -135,8 +135,6 @@ education_wide <- education_wide %>%
 # Bring the delaware columns at the end
 education_wide <- education_wide %>%
   relocate(ends_with("_delaware"), .after = last_col())
-# Save data
-write_rds(education_wide, here("data/processed/education_achievement_wide.rds"))
 
 # Create a table for literacy
 ELA <- education_wide %>%
@@ -144,7 +142,6 @@ ELA <- education_wide %>%
   rename_with(starts_with("ELA_"), .fn = ~str_remove(., "ELA_"))
 ## Save data
 write_rds(ELA, here("data/processed/education_achievement_wide_ELA.rds"))
-
 
 # Create a table for math
 math <- education_wide %>%

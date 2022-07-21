@@ -94,4 +94,4 @@ graduation_gaps_wide <- graduation_gaps_wide %>%
                                                         colorname = "yellow")))
 
 # Save the dataset
-write_rds(graduation_gaps_wide, here("data/processed/education_graduation_gaps.rds"))
+write_rds(graduation_gaps_wide, here("data/processed/education_graduation_summary.rds"))

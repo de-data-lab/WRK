@@ -106,15 +106,6 @@ unemployment_summary_long <- unemployment_summary_de %>%
   bind_rows(unemployment_summary_target_tracts_aggregate) %>%
   bind_rows(unemployment_summary_target_tracts)
 
-# Wide format - each row is a year
-unemployment_summary_wide <- unemployment_summary_long %>%
-  pivot_wider(names_from = label, values_from = unemployed_prop)
-# Calculate the gaps
-unemployment_summary_wide <- unemployment_summary_wide %>%
-  mutate(WRK_gap_to_Delaware = WRK - Delaware,
-         WRK_gap_to_Wilmington = WRK - Wilmington)
-
-# Save summary tables
+# Save summary table
 write_rds(unemployment_summary_long, here("data/processed/workforce_unemployment_sum_long.rds"))
-write_rds(unemployment_summary_wide, here("data/processed/workforce_unemployment_sum_wide.rds"))
 

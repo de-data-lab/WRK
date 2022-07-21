@@ -1,6 +1,6 @@
 [![Production](https://img.shields.io/badge/Deployment-Production-78BE20)](https://techimpact.shinyapps.io/WRK-dashboard) [![Test](https://img.shields.io/badge/Deployment-Test-0057B8)](https://techimpact.shinyapps.io/WRK-dashboard-test)
 
-# WRK Group Dashboard
+# WRK Group Dashboard 
 
 A repository for the WRK Group Dashboard in 2022.
 
@@ -27,6 +27,43 @@ To get data for the survey results, we pull private data from the Azure blob wit
 Note that SAS token may expire with time. Check with the Azure console in case of an error.
 
 ## How the data are sourced
+
+``` mermaid
+graph LR;
+    subgraph sourcing["Data Sources"]
+      HUD["Housing and Urban Development"]
+      ODD["Open Data Delaware"]
+      kidsCount["Kids Count"]
+      census["Census Bureau"]
+      WRK["WRK Group Data"]
+    end
+      
+    HUD["Housing and Urban Development"] --> housingUnits;
+    ODD["Open Data Delaware"] --> HSach;
+    ODD["Open Data Delaware"] --> HSgrad;
+    kidsCount["Kids Count"] --> kinderReadiness;
+    census["Census Bureau"] --> employment;
+    WRK["WRK Group Data"] --> kinderReadiness;
+    WRK --> events;
+    WRK --> surveyResponses;
+   
+    housingUnits["Subsidised units data"] --> housingTab;
+    HSach["High School Achievement (ELA & Math)"] --> educationTab;
+    HSgrad["High School Graduation"] --> educationTab;
+    kinderReadiness["Kindergarten Readiness"] --> educationTab;
+    employment["Employment Rates"] --> workforceTab;
+    surveyResponses["Safety survey responses"] --> safetyTab;
+    events["Events data"] --> eventsTab;
+    
+    subgraph tabs["Dashboard Tabs"]
+      housingTab["Housing"]
+      educationTab["Education"]
+      workforceTab["Workforce Dev"]
+      safetyTab["Safety"]
+      eventsTab["Events"]
+    end
+```
+
 
 The scripts that downloads and transforms the data are stored in the `/ETL` folder.
 

@@ -38,27 +38,27 @@ graph LR;
       WRK["WRK Group Data"]
     end
       
-    HUD["Housing and Urban Development"] --> housingUnits;
-    ODD["Open Data Delaware"] --> HSach;
-    ODD["Open Data Delaware"] --> HSgrad;
-    kidsCount["Kids Count"] --> kinderReadiness;
-    census["Census Bureau"] --> employment;
-    WRK["WRK Group Data"] --> kinderReadiness;
+    HUD --> housingUnits;
+    ODD --> HSach;
+    ODD --> HSgrad;
+    kidsCount --> kinderReadiness;
+    census --> employment;
+    WRK --> kinderReadiness;
     WRK --> events;
     WRK --> surveyResponses;
    
     housingUnits["Subsidised units data"] --> housingTab;
-    HSach["High School Achievement (ELA & Math)"] --> educationTab;
-    HSgrad["High School Graduation"] --> educationTab;
-    kinderReadiness["Kindergarten Readiness"] --> educationTab;
-    employment["Employment Rates"] --> workforceTab;
+    HSach["High school achievement (ELA & Math)"] --> educationTab;
+    HSgrad["High school graduation"] --> educationTab;
+    kinderReadiness["Kindergarten readiness"] --> educationTab;
+    employment["Employment rates"] --> workforceTab;
     surveyResponses["Safety survey responses"] --> safetyTab;
     events["Events data"] --> eventsTab;
     
     subgraph tabs["Dashboard Tabs"]
       housingTab["Housing"]
       educationTab["Education"]
-      workforceTab["Workforce Dev"]
+      workforceTab["Workforce"]
       safetyTab["Safety"]
       eventsTab["Events"]
     end

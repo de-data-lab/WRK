@@ -44,13 +44,11 @@ extract_table <- function(docx_file, year, quarter){
     mutate(tables_clean = map(tables, clean_metrics))
   
   # filter the values
-  metrics_clean <- metrics %>%
+  metrics %>%
     unnest(tables_clean) %>%
     select(-tables) %>% 
     mutate(year = year,
            quarter = quarter)
-  
-  return(metrics_clean)
 }
 
 # Plot Settings
@@ -84,7 +82,7 @@ plot_bar <- function(.data, outcome, method = "mean", y_lab, x_lab){
       ylab(y_lab_summary)
   }
   
-  return(outplot)
+  outplot
   
 }
 

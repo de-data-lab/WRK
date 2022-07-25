@@ -25,10 +25,9 @@ label_tracts_with_places <- function(input_df){
     st_drop_geometry() %>% 
     select(GEOID_tract, GEOID_place, NAME_place, NAMELSAD_place)
   
-  output_df <- input_df %>% 
+  # Return a joined dataframe
+  input_df %>% 
     left_join(de_key_table, by = c("GEOID" = "GEOID_tract"))
-  
-  return(output_df)
 }
 
 

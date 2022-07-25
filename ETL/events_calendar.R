@@ -32,11 +32,9 @@ download_calendar <- function(year = 2020){
   # Get the list of dataframes in the content 
   raw_dfs <- fromJSON(res_content)
   
-  # Get the events data frame only
-  events_df <- raw_dfs$Events %>% 
+  # Get the events data frame only and return it
+  raw_dfs$Events %>% 
     as_tibble()
-  
-  return(events_df)
 }
 
 

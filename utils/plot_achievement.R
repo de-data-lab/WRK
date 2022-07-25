@@ -20,7 +20,8 @@ plot_achievement <- function(selected_contentarea = c("ELA", "MATH"),
     filter(organization %in% selected_orgs) %>% 
     filter(subgroup %in% selected_grades)
   
-  cur_plot <- cur_data %>% 
+  # Create a plot
+  cur_data %>% 
     ggplot(aes(x = schoolyear, y = pctproficient,
                color = organization, group = organization)) +
     geom_line() +
@@ -35,8 +36,6 @@ plot_achievement <- function(selected_contentarea = c("ELA", "MATH"),
     ggtitle("Students achieving proficiency") +
     labs(caption = "Source: data.delaware.gov - Student Asessment Performance") +
     theme_gray()
-  
-  return(cur_plot)
 }
 
 # Choices for UI

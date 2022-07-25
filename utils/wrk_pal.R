@@ -41,6 +41,5 @@ get_wrk_color <- function(colorname = "blue",
   
   pal <- WRK_pallets[[palette]]
   
-  return(pal[[colorname]])
-  
+  pal[[colorname]]
 }

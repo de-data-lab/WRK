@@ -31,11 +31,12 @@ get_edu_data <- function(params = list()){
   base_URL <- "https://data.delaware.gov/resource/ms6b-mt82.json?"
   params_URL <- paste0(names(params),"=", params, collapse = "&")
   query_URL <- URLencode(paste0(base_URL, params_URL))
-  raw_data <- fromJSON(query_URL) %>%
+  
+  # Convert data to numeric and return as a tibble
+  fromJSON(query_URL) %>%
     as_tibble() %>%
     mutate(pctproficient = as.numeric(pctproficient),
            schoolyear = as.numeric(schoolyear))
-  return(raw_data)
 }
 
 # Get data from the Delaware Open Data Portal

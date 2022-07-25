@@ -1211,7 +1211,7 @@ output$graduation <- renderPlotly({
     labs(color = NULL) + 
     ggtitle("High school graduation rate")
   
-  return(ggplotly(out_plot))
+  ggplotly(out_plot)
 })
 
 plotlyOutput("graduation")

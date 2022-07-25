@@ -1,4 +1,4 @@
-### Average change in proportion of occupied units
+### Average change in proportion of occupied units {`r valbox_style`}
 
 ```{r}
 # Get the text to be rendered

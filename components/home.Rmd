@@ -86,7 +86,7 @@ Column 2 {data-height=500}
 
 ::::: {.d-flex}
 
-### day
+### day {`r valbox_style`}
 ```{r}
 
 render_safety_valbox(categoricals_prop,
@@ -94,7 +94,7 @@ render_safety_valbox(categoricals_prop,
                      icon = "fa-sun-o")
 ```
 
-### night
+### night {`r valbox_style`}
 
 ```{r}
 render_safety_valbox(categoricals_prop,

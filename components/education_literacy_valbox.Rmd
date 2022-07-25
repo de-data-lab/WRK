@@ -1,4 +1,4 @@
-### Improvement in literacy achievement gap to Delaware {data-height=`r edu_valbox_height`}
+### Improvement in literacy achievement gap to Delaware {data-height=`r edu_valbox_height` `r valbox_style`}
 
 ```{r}
 # Render value box

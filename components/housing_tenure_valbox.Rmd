@@ -1,4 +1,4 @@
-### Average months since moved in
+### Average months since moved in {`r valbox_style`}
 
 ```{r}
 # Combine the Riverside and DE data

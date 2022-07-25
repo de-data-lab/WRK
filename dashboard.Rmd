@@ -6,8 +6,8 @@ output:
     vertical_layout: fill
     theme: 
       version: 4
-      primary: "#0c8ccd" #blue
-      warning: "#ffc934" #yellow
+      primary: "#49da93" #green
+      warning: "#47adbb" #blue
       navbar-bg: "#00a454" #green
     navbar:
       - {icon: "fa-github", href: "https://github.com/de-data-lab/WRK", target: "_blank"}
@@ -60,6 +60,9 @@ target_tracts <- c("CT 30.02 (Riverside)" = "10003003002",
 
 # Set ggplot global theme
 theme_set(theme_minimal())
+
+# Set the color for the texts in the value boxes 
+valbox_style <- ".text-white"
 ```
 
 # Home {data-orientation=rows}
@@ -710,15 +713,14 @@ Column 1
 
 ::::: {.d-flex}
 
-### Day
+### Day {`r valbox_style`}
 ```{r}
-
 render_safety_valbox(categoricals_prop,
                      color = "primary",
                      icon = "fa-sun-o")
 ```
 
-### Night
+### Night {`r valbox_style`}
 
 ```{r}
 render_safety_valbox(categoricals_prop,

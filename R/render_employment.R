@@ -70,5 +70,6 @@ render_employment <- function(.data, level = "WRK", compare_to = "Wilmington") {
     add_title(plot_title) %>%
     # Add source
     plotly_caption_source("Census 5-year ACS",
-                          href = "https://www.census.gov/")
+                          href = "https://www.census.gov/",
+                          y = -0.08)
 }

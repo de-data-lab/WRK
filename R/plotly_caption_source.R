@@ -5,7 +5,7 @@ plotly_caption_source <- function(p, name,
   a_tag <- a(name, href = href)
   
   # If href is null, just use span
-  a_tag <- span(name)
+  if(is.null(href)) a_tag <- span(name)
   
   # Create the source text
   caption <- paste0("Source: ", a_tag)

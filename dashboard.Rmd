@@ -899,7 +899,12 @@ ggplotly(event_counts_plot, tooltip = "text") %>%
   plotly_disable_zoom() %>%
   plotly_hide_modebar() %>%
   # Disable the click event for the legend 
-  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE)) %>%
+  # Add caption
+  plotly_caption_source("The Warehouse Calendar",
+                        "https://thewarehouse.recdesk.com/Community/Calendar",
+                        y = -0.06,
+                        font_size = 12)
 ```
 
 
@@ -946,7 +951,12 @@ events_weekly_plot <- events_weekly_duration %>%
 # Render the plot
 ggplotly(events_weekly_plot, tooltip = "text") %>%
   plotly_disable_zoom() %>%
-  plotly_hide_modebar()
+  plotly_hide_modebar() %>%
+  # Add caption
+  plotly_caption_source("The Warehouse Calendar",
+                        "https://thewarehouse.recdesk.com/Community/Calendar",
+                        y = -0.15,
+                        font_size = 12)
 ```
 
 
@@ -983,7 +993,12 @@ ggplotly(top_events_plot, tooltip = "text") %>%
   plotly_disable_zoom() %>%
   plotly_hide_modebar() %>%
   # Disable the click event for the legend 
-  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE))
+  layout(legend = list(itemclick = FALSE, itemdoubleclick = FALSE)) %>%
+  # Add caption
+  plotly_caption_source("The Warehouse Calendar",
+                        "https://thewarehouse.recdesk.com/Community/Calendar",
+                        y = -0.15,
+                        font_size = 12)
 ```
 
 

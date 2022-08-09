@@ -1,11 +1,12 @@
 plotly_caption_source <- function(p, name,
                                   href = NULL,
-                                  x = 1, y = -0.1) {
+                                  x = 1, y = -0.1,
+                                  font_size = NULL) {
   # Create the caption body
   a_tag <- a(name, href = href)
   
   # If href is null, just use span
-  a_tag <- span(name)
+  if(is.null(href)) a_tag <- span(name)
   
   # Create the source text
   caption <- paste0("Source: ", a_tag)
@@ -15,5 +16,6 @@ plotly_caption_source <- function(p, name,
                     text = caption,
                     showarrow = FALSE, xref ="paper", yref = "paper", 
                     xanchor = "right", yanchor = "auto",
-                    font = list(color = "grey"))
+                    font = list(color = "grey",
+                                size = font_size))
 }

@@ -1,4 +1,5 @@
 # Utility functions
+source(here("utils/wrk_pal.R"))
 
 # Function to clean each table
 clean_metrics <- function(.tbl){
@@ -53,7 +54,7 @@ extract_table <- function(docx_file, year, quarter){
 
 # Plot Settings
 geom_plot_col <- list(
-  geom_col(width = 0.7),
+  geom_col(width = 0.7, fill = get_wrk_color("blue")),
   theme_minimal()
 )
 

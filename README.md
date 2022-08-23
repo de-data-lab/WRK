@@ -102,3 +102,11 @@ Safety data are sourced from the 2021 WRK Group Community survey. The original, 
 ### Events
 
 Events data are sourced from [The Warehouse Calendar](https://thewarehouse.recdesk.com/Community/Calendar). The ETL script (`events_calendar.R`) performs a POST request to the calendar API, and repeats it to get the calendar from 2020 to the latest year. The script transforms the data and saves the dataset as an RDS file (`events_warehouse_calendar.rds`).
+
+
+## About Data Innovation Lab
+
+This repo was created by us, the Data Innovation Lab at Tech Impact. Our team uses advanced data analytics 
+and artificial intelligence to help organizations solve problems that will make our communities a better place. 
+Visit [our website](https://techimpact.org/services/data-lab/) or [email us](mailto:labprojects@techimpact.org) to get in touch.
+

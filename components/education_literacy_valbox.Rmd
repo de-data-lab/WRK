@@ -1,8 +1,0 @@
-### Improvement in literacy achievement gap to Delaware {data-height=`r edu_valbox_height`}
-
-```{r}
-# Render value box
-eastside_ELA_gap_coeff %>%
-  sprintf("%+.1f%% per year", .) %>%
-  valueBox(icon = "fa-book-open")
-```

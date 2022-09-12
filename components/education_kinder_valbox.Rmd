@@ -1,5 +1,0 @@
-### More kindergarten-ready than Delaware average {data-height=`r edu_valbox_height`}
-
-```{r}
-valueBox(print_pct(kinder_pct_diff), icon = "fa-child")
-```

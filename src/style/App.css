@@ -1,0 +1,249 @@
+
+.stats-board {
+  display: flex;
+  background-color: #391D6A;
+  height: 590px;
+}
+
+.stats-box {
+  background: linear-gradient(#8c6bb1, #88419d);
+	margin: 15px;
+	border-radius: 5px;
+	width: 350px;
+  height: 560px;
+}
+
+.stats-header {
+  padding: 15px 25px;
+	position: relative;
+}
+
+.stats-header-title {
+	font-size: 18px;
+}
+
+.stats-list {
+  padding: 0 0px;
+}
+
+.stats-item {
+  color: #fff;
+	position: relative;
+	padding-bottom: 25px;
+  padding-left: 20px;
+}
+
+.stats-amount {
+  font-size: 42px;
+	font-weight: bold;
+	line-height: 1.2;
+}
+
+.stats-caption {
+  font-size: 18px;
+  padding-right: 20px;
+}
+
+.stats-change {
+	position: absolute;
+	top: 10px;
+	right: 0;
+	text-align: right;
+	color: #bdbdbd;
+  padding-right: 20px;
+}
+
+.stats-value {
+	font-size: 18px;
+  font-weight: 500;
+}
+
+.stats-value-negative {
+  color: #ce1256;
+}
+
+.stats__value--positive {
+	color: #41ae76;
+}
+
+.stats-period {
+	font-size: 14px;
+}
+
+.header {
+  margin-bottom: 40px;
+  display: flex;
+  height: 100px;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #391D6A;
+}
+
+.logo {
+  display: flex;
+  margin-left: 20px;
+}
+
+.logo:hover {
+  cursor: pointer;
+  background: linear-gradient(#c994c7, #df65b0);
+  transition: all 0.5s ease;
+}
+
+.logoIcon {
+  height: 80px;
+}
+
+.logoText {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 1rem;
+  color: #ffffff;
+}
+
+.navbar {
+  display: flex;
+}
+
+.navbar-tab:hover {
+  background: linear-gradient(#c994c7, #df65b0);
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.chart {
+  height: 510px;
+}
+
+.chart-board {
+  display: flex;
+}
+
+#header {
+  font-size: 30px;
+  color: #d9d9d9;
+  text-align: left;
+  margin-left: 120px;
+  margin-bottom: 30px;
+}
+
+#available, #occupied, #months, 
+#kindergarden, #literacy, #math, 
+#graduation, #employment, #walking,
+#rating, #concern, #number, 
+#hours, #programs {
+  position: absolute;
+  width: 220px;
+  height: auto;
+  padding: 10px;
+  background-color: #391D6A;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4); 
+  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4); 
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4); 
+  pointer-events: none;
+}
+
+#available.hidden, #occupied.hidden , #months.hidden, 
+#kindergarden.hidden, #literacy.hidden, #math.hidden, 
+#graduation.hidden, #employment.hidden, #walking.hidden,
+#rating.hidden, #concern.hidden, #number.hidden,
+#hours.hidden, #programs.hidden { 
+  display: none;
+}
+
+#available p, #occupied p, #months p, 
+#kindergarden p, #literacy p, #math p, 
+#graduation p, #employment p, #walking p, 
+#rating p, #concern p, #number p,
+#hours p, #programs p {  
+  margin: 0;
+  font-family: sans-serif; 
+  font-size: 16px;
+  line-height: 20px;
+  color:#d95f02;
+  text-align: center;
+}
+
+#footer p {
+  font-size: 15px;
+  line-height: 14px;
+  color: gray;
+  text-align: center;
+}
+
+.line {
+  fill: none;
+  stroke: #a8ddb5;
+  stroke-width: 2;
+}
+
+.delawareLine, .line2021 {
+  fill: none;
+  stroke: #e7298a;
+  stroke-width: 2;
+}
+
+.line2020 {
+  fill: none;
+  stroke: #fee391;
+  stroke-width: 2;
+}
+
+.radio-buttons {
+  display: inline-flex;
+  margin-left: 300px;
+}
+
+.form-group {
+  margin-right: 70px;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+label {
+  cursor: pointer;
+  position: relative;
+  font-size: 20px;
+  color: #fff;
+}
+
+label::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: transparent;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+  transition: border-color 400ms ease;
+}
+
+label::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: rgb(177, 39, 108);
+  border: 2px solid rgb(177, 39, 108);
+  border-radius: 50%;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%) scale(0);
+  transition: transform 400ms ease;
+}
+
+input[type="radio"]:checked + label::before {
+  border-color: rgb(177, 39, 108);
+}
+
+input[type="radio"]:checked + label::after {
+  transform: translateY(-50%) scale(0.55);
+}

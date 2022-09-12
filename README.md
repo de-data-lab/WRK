@@ -1,112 +1,70 @@
-[![Production](https://img.shields.io/badge/Deployment-Production-78BE20)](https://techimpact.shinyapps.io/WRK-dashboard) [![Test](https://img.shields.io/badge/Deployment-Test-0057B8)](https://techimpact.shinyapps.io/WRK-dashboard-test)
+# Getting Started with Create React App
 
-# WRK Group Dashboard 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-A repository for the WRK Group Dashboard in 2022.
+## Available Scripts
 
-## Environment Variables
+In the project directory, you can run:
 
-The environment variables are stored in the `.Renviron` file.
+### `npm start`
 
--   `CENSUS_API_KEY`: The Census API key obtained from [here](https://api.census.gov/data/key_signup.html)
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-### Azure-Related
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-To get data for the survey results, we pull private data from the Azure blob with the following environment variables:
+### `npm test`
 
-#### For downloading the raw responses
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
--   `AZURE_WRK_SURVEY_RAW_URL` - URL to the Excel file
--   `AZURE_WRK_SURVEY_RAW_SAS_TOKEN` - SAS token for the file
+### `npm run build`
 
-#### For uploading the processed dataset about safety-related responses
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
--   `AZURE_WRK_SURVEY_PROCESSED_URL` - URL to the processed data Excel file
--   `AZURE_WRK_SURVEY_PROCESSED_SAS_TOKEN` - SAS token for the file
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-Note that SAS token may expire with time. Check with the Azure console in case of an error.
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## How the data are sourced
+### `npm run eject`
 
-``` mermaid
-graph LR;
-    subgraph sourcing["Data Sources"]
-      HUD["Housing and Urban Development"]
-      ODD["Open Data Delaware"]
-      kidsCount["Kids Count"]
-      census["Census Bureau"]
-      WRK["WRK Group Data"]
-    end
-      
-    HUD --> housingUnits;
-    ODD --> HSach;
-    ODD --> HSgrad;
-    kidsCount --> kinderReadiness;
-    census --> employment;
-    WRK --> kinderReadiness;
-    WRK --> events;
-    WRK --> surveyResponses;
-   
-    housingUnits["Subsidised units data"] --> housingTab;
-    HSach["High school achievement (ELA & Math)"] --> educationTab;
-    HSgrad["High school graduation"] --> educationTab;
-    kinderReadiness["Kindergarten readiness"] --> educationTab;
-    employment["Employment rates"] --> workforceTab;
-    surveyResponses["Safety survey responses"] --> safetyTab;
-    events["Events data"] --> eventsTab;
-    
-    subgraph tabs["Dashboard Tabs"]
-      housingTab["Housing"]
-      educationTab["Education"]
-      workforceTab["Workforce"]
-      safetyTab["Safety"]
-      eventsTab["Events"]
-    end
-```
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-The scripts that downloads and transforms the data are stored in the `/ETL` folder.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-### Housing Data
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-Housing data are sourced from the [assisted housing data](https://www.huduser.gov/portal/datasets/assthsg.html) from [the US Department of Housing and Urban Development (HUD)](https://www.hud.gov/). The data are stored in Excel files. Each year's dataset is divided into two files depending on the states (AK-MN vs. MO-WY). The "AK-MN" Excel files contain Delaware's data, and thus they are downloaded into the `data/raw/hud` folder.
+## Learn More
 
-Note: To add new data, simply download new Excel files into the `data/raw/hud` folder.
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-The ETL script (`housing.R`) will looks for all the excel files available in the raw folder, combines them, and saves the processed file into an RDS file (`data/processed/hud_DE_combined.rds`).
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Education
+### Code Splitting
 
-#### Kindergarten Readiness
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-National kindergarten readiness data are sourced from [the Kindergarten readiness in Delaware dataset](https://datacenter.kidscount.org/data/tables/10050-kindergarten-readiness?loc=9&loct=2#detailed/2/any/false/1729,37,871,870/3284,3285,6044,6046,6047/19442) from [Kids Count Data Center](https://datacenter.kidscount.org/). The ETL script (`education_kindergarten.R`) downloads the Excel data as a temporary file and saves the processed data into an RDS file (`education_kinder_readiness_wide.rds`).
+### Analyzing the Bundle Size
 
-In addition, the dashboard uses the WRK Group's internal data about the kindergarten readiness. The summary dataset is stored in an RDS file (`education_kinder_readiness_WRK.rds`).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-#### High School Achievement and Graduation Rate
+### Making a Progressive Web App
 
-High school achievement and graduation rate data are sourced from the [Delaware Open Data Portal](https://data.delaware.gov/).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-The high school achievement data are sourced from [the Student Assessment Performance dataset](https://data.delaware.gov/Education/Student-Assessment-Performance/ms6b-mt82). The ETL script (`education_achievement.R`) calls the portal's API, add additional labels, and produces two datasets separately for the literacy/ELA achievement (`education_achievement_wide_ELA.rds`) and math achievement (`education_achievement_wide_math.rds`).
+### Advanced Configuration
 
-The high school graduation data are sourced from the [Student Graduation dataset](https://data.delaware.gov/Education/Student-Graduation/t7e6-zcnn). The ETL script (`education_graduation.R`) calls the portal's API, downloads the data, add additional labels, and saves the dataset into two RDS files, a district-wise dataset (`education_graduation.rds`), and a summary dataset (`education_graduation_summary.rds`).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Workforce Development
+### Deployment
 
-Employment data are sourced from the [5-year American Community Survey datasets](https://www.census.gov/programs-surveys/acs) from the [US Census](https://www.census.gov/). The ETL script (`workforce_unemployment.R`) calls the Census API with a Census API key, stored as an environment variable (`CENSUS_API_KEY`). Then, the script gets the data about the number of total labor force (B23025_003) and the number of unemployed people (B23025_005) for census tracts across the years. The script is set up to get the data from 2014 to the latest year. The script saves two files: a tract-wise dataset (`workforce_unemployment.rds`), and a summary table (`workforce_unemployment_sum_long.rds`).
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### Safety
+### `npm run build` fails to minify
 
-Safety data are sourced from the 2021 WRK Group Community survey. The original, participant-wise dataset is private, and stored in a blob storage on Azure. The ETL script (`safety_WRK_survey.R`) uses the environment variables to download the Excel file containing data. Then, the script transforms the data into a summary table. Along the way, the script also uploads the processed dataset back into an Azure instance. Finally, the script saves the summary dataset as an RDS file (`safety_WRK_survey_2021.rds`).
-
-### Events
-
-Events data are sourced from [The Warehouse Calendar](https://thewarehouse.recdesk.com/Community/Calendar). The ETL script (`events_calendar.R`) performs a POST request to the calendar API, and repeats it to get the calendar from 2020 to the latest year. The script transforms the data and saves the dataset as an RDS file (`events_warehouse_calendar.rds`).
-
-
-## About Data Innovation Lab
-
-This repo was created by us, the Data Innovation Lab at Tech Impact. Our team uses advanced data analytics 
-and artificial intelligence to help organizations solve problems that will make our communities a better place. 
-Visit [our website](https://techimpact.org/services/data-lab/) or [email us](mailto:labprojects@techimpact.org) to get in touch.
-
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

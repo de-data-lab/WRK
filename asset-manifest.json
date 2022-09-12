@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/WRK/static/css/main.921537a2.css",
+    "main.js": "/WRK/static/js/main.d60cbc65.js",
+    "static/media/events_warehouse_calendar.csv": "/WRK/static/media/events_warehouse_calendar.03847f0d0cd9b294baa0.csv",
+    "static/media/hud_de_combined.csv": "/WRK/static/media/hud_de_combined.29effa8a368d01718e2e.csv",
+    "static/media/workforce_unemployment_sum.csv": "/WRK/static/media/workforce_unemployment_sum.96fd257a6af84d7211e0.csv",
+    "static/media/safety_WRK_survey_2021.csv": "/WRK/static/media/safety_WRK_survey_2021.95e2a3159a555923b89f.csv",
+    "index.html": "/WRK/index.html",
+    "static/media/education_kinder_readiness_wide.csv": "/WRK/static/media/education_kinder_readiness_wide.72f4ce49c2341289aa0a.csv",
+    "static/media/education_graduation_summary.csv": "/WRK/static/media/education_graduation_summary.16937ed0da61c192bd00.csv",
+    "static/media/education_achievement_wide_ELA.csv": "/WRK/static/media/education_achievement_wide_ELA.24bb2224d83736393ad6.csv",
+    "static/media/education_achievement_wide_math.csv": "/WRK/static/media/education_achievement_wide_math.5d703c6218f9344876a1.csv",
+    "static/media/safety_walking.csv": "/WRK/static/media/safety_walking.9db1d35e678fd44e2c07.csv",
+    "static/media/education_kinder_readiness_WRK.csv": "/WRK/static/media/education_kinder_readiness_WRK.e1706ae76ca8289671f6.csv",
+    "static/media/safety_rating.csv": "/WRK/static/media/safety_rating.725bb2dd18f4d561f8ae.csv",
+    "main.921537a2.css.map": "/WRK/static/css/main.921537a2.css.map",
+    "main.d60cbc65.js.map": "/WRK/static/js/main.d60cbc65.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.921537a2.css",
+    "static/js/main.d60cbc65.js"
+  ]
+}

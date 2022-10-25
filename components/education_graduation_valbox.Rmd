@@ -1,4 +1,4 @@
-### Improvement in 4-year high school graduation gap to Delaware, since 2016 {data-height=`r edu_valbox_height`}
+### Improvement in 4-year high school graduation gap to Delaware, since 2016 {data-height=`r edu_valbox_height` `r valbox_style`}
 
 ```{r}
 gap_yearly_change_2016 %>%

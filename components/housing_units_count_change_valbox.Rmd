@@ -1,4 +1,4 @@
-### Change in available units for rent
+### Change in available units for rent {`r valbox_style`}
 
 ```{r}
 total_units_change_box_text <- riverside_total_units_coef %>%
